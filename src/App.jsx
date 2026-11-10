@@ -471,6 +471,49 @@ const T = {
     arc: [[70, 100], [90, 84], [96, 54]],
     lbl: ["Pendurado, ombros ativos", "Enrola a pelve para cima"],
   },
+  /* ---------- BLOCO 2 ---------- */
+  cable_fly_up: {
+    a: F([20, 54, 28, 68, 7, 88, 7, 110]),
+    b: F([20, 36, 6, 28, 7, 88, 7, 110]),
+    eq: [["cable", 112, 100, 90, 68], ["cable", 12, 100, 34, 68]],
+    arc: [[90, 68], [86, 42], [70, 28]],
+    lbl: ["Mãos baixas, ao lado do quadril", "Sobe e fecha no peito alto"],
+  },
+  abductor: {
+    a: F([12, 48, 14, 62, 5, 78, 6, 94]),
+    b: F([12, 48, 14, 62, 22, 78, 30, 94]),
+    eq: [["pad", 62, 52, 30, 24], ["padv", 73, 80], ["padv", 51, 80]],
+    arc: [[68, 94], [80, 96], [92, 94]],
+    lbl: ["Pernas fechadas, tronco à frente", "Abre ao máximo e segura 1s"],
+  },
+  close_bench: {
+    a: S([91, 63, 80, 66, 70, 76, 73, 58, 48, 67, 31, 76, 27, 97]),
+    b: S([91, 63, 80, 66, 79, 52, 78, 34, 48, 67, 31, 76, 27, 97]),
+    eq: [["bench", 38, 72, 92, 0], ["floor", 99], ["barv", 73, 58], ["barv", 78, 34]],
+    arc: [[76, 58], [80, 46], [80, 36]],
+    lbl: ["Barra no peito baixo, cotovelo perto", "Estende sem abrir o cotovelo"],
+  },
+  split_squat: {
+    a: S([60, 20, 58, 32, 58, 46, 58, 60, 56, 60, 66, 82, 68, 106]),
+    b: S([70, 45, 64, 56, 64, 70, 64, 84, 52, 80, 74, 84, 68, 106]),
+    eq: [["bench", 10, 82, 36, 0], ["floor", 108], ["dumb2", 58, 60], ["dumb2", 64, 84]],
+    arc: [[56, 62], [50, 72], [52, 80]],
+    lbl: ["Passo longo, pé de trás no banco", "Desce fundo com o tronco à frente"],
+  },
+  leg_press_deep: {
+    a: S([34, 58, 44, 64, 50, 74, 58, 78, 52, 78, 48, 50, 73, 57]),
+    b: S([34, 58, 44, 64, 50, 74, 58, 78, 52, 78, 70, 57, 90, 40]),
+    eq: [["seat", 26, 84, 24, 26], ["plate", 77, 53], ["plate", 94, 36]],
+    arc: [[76, 54], [86, 50], [92, 40]],
+    lbl: ["Pé alto, coxa perto do peito", "Empurra pelo calcanhar, quadril colado"],
+  },
+  walk_incline: {
+    a: S([62, 20, 60, 32, 54, 44, 52, 56, 58, 60, 66, 82, 72, 103]),
+    b: S([62, 20, 60, 32, 64, 44, 72, 52, 58, 60, 54, 84, 46, 106]),
+    eq: [["bench", 6, 110, 150, 12]],
+    arc: [[46, 104], [60, 98], [72, 101]],
+    lbl: ["Esteira inclinada, passo firme", "Ritmo de conversa, sem segurar"],
+  },
 };
 
 /* mapa exercício → template (figuras esquemáticas; variações compartilham o padrão) */
@@ -491,6 +534,9 @@ const FIGMAP = {
   pant_pe: "calf", pant_sentada: "calf",
   cable_crunch: "crunch_kneel", hanging_leg: "hang_leg",
   rdl: "hinge", hip_thrust: "hip_thrust",
+  crossover_baixo: "cable_fly_up", abdutora: "abductor", supino_fechado: "close_bench",
+  bulgaro: "split_squat", leg_press_uni: "leg_press_deep", cardio: "walk_incline",
+  rosca_direta: "curl_front",
 };
 
 function Figure({ pose, color, dim }) {
@@ -590,7 +636,7 @@ const EX = {
     equip: "Cabo / polia baixa",
     primary: ["deltLat"], secondary: ["upBack", "traps"],
     target: "Deltoide lateral", sec: "Trapézio superior, supraespinal",
-    goal: "É o exercício mais importante da sua semana e por isso abre o Push A, com você descansado. O cabo mantém tensão na posição inicial (braço junto ao corpo), onde o halter praticamente não oferece resistência — exatamente a região que o deltoide lateral menos recebe estímulo no seu treino antigo.",
+    goal: "É o exercício mais importante da sua semana e por isso abre o A, com você descansado. No A1 entra em segundo, depois do halter. O cabo mantém tensão na posição inicial (braço junto ao corpo), onde o halter praticamente não oferece resistência.",
     setup: ["Polia na posição mais baixa, punho ou pegada simples.", "Fique de lado, cabo passando pela frente do corpo, mão do lado oposto à polia.", "Segure algo fixo com a outra mão. Pés na largura do quadril, tronco levemente inclinado (~10°) para o lado da polia."],
     exec: ["Braço quase estendido, cotovelo com leve flexão travada.", "Suba levando o COTOVELO, não a mão — a mão termina um pouco abaixo do cotovelo.", "Suba até um pouco acima da linha do ombro.", "Desça em 2–3 segundos controlando até a mão cruzar a coxa."],
     breath: "Inspira antes de subir, expira na subida.",
@@ -598,7 +644,7 @@ const EX = {
     tempo: "1s sobe · 1s pausa curta no topo · 2–3s desce",
     errors: ["Impulso de quadril ou joelho para lançar o peso.", "Girar o punho para cima (polegar alto) — reduz a linha de força do deltoide.", "Encolher o ombro na subida.", "Parar a descida no meio e perder a metade alongada do movimento.", "Carga alta demais transformando em remada alta."],
     cue: "Cotovelo lidera. Mão vai a reboque.",
-    progress: "Faixa 10–15. Quando as 4 séries baterem 15 reps limpas com RIR 1, sobe 1 placa (ou o menor incremento disponível) e volta para ~10.",
+    progress: "Use a faixa do dia (10–15 no A, 12–15 no A1). Quando todas as séries baterem o topo com RIR 1, sobe 1 placa (ou o menor incremento disponível) e volta para o início da faixa.",
   },
   supino_incl_halt: {
     name: "Supino inclinado com halteres",
@@ -635,7 +681,7 @@ const EX = {
     equip: "Halteres",
     primary: ["deltLat"], secondary: ["traps", "deltFront"],
     target: "Deltoide lateral", sec: "Trapézio superior",
-    goal: "Segundo bloco de lateral no mesmo dia, com faixa mais alta de repetições e carga menor. Aqui o objetivo é acúmulo metabólico, não carga — as duas variações juntas cobrem perfis de resistência diferentes.",
+    goal: "Aparece duas vezes. No A, fecha o bloco de lateral com carga leve e reps altas. No A1, abre o dia com você descansado. O halter carrega mais o topo do movimento; embaixo quase não há resistência, por isso pare a descida antes de encostar na coxa.",
     setup: ["Em pé, pés na largura do quadril, halteres ao lado do corpo.", "Tronco levemente inclinado à frente (~10°).", "Cotovelos com flexão leve e fixa."],
     exec: ["Suba os dois braços simultaneamente, cotovelo à frente da mão.", "Até um pouco acima da linha do ombro.", "Desça em 2–3s, sem deixar o halter bater na coxa."],
     breath: "Expira subindo.",
@@ -643,7 +689,7 @@ const EX = {
     tempo: "1s sobe · 2–3s desce",
     errors: ["Balanço do tronco para gerar impulso.", "Encolher o trapézio junto.", "Girar o punho e virar 'despejar a jarra' de forma exagerada.", "Amplitude curta com carga alta.", "Pressa entre as repetições."],
     cue: "Sobe amplo, desce devagar.",
-    progress: "Faixa 12–20. Chegou a 20 nas três séries com RIR 0–2 → sobe 1–2 kg e volta para ~12.",
+    progress: "Use a faixa do dia (12–20 no A, 10–15 no A1). Bateu o topo nas três séries com o RIR planejado → sobe 1–2 kg e volta para o início da faixa.",
   },
   crucifixo_maq: {
     name: "Crucifixo na máquina / Pec Deck",
@@ -665,7 +711,7 @@ const EX = {
     equip: "Cabo + corda",
     primary: ["triceps"], secondary: [],
     target: "Tríceps (cabeça longa)", sec: "—",
-    goal: "Único exercício direto de tríceps do Push A. Com o braço acima da cabeça a cabeça longa fica alongada, que é o que a pushdown não entrega. Tríceps foi cortado de 10 para 6 séries semanais porque braço já é seu ponto forte.",
+    goal: "Com o braço acima da cabeça, a cabeça longa do tríceps fica alongada, que é o que a pushdown não entrega. Há estudo mostrando mais crescimento de tríceps com extensão acima da cabeça do que com pushdown. Aparece no A e no D.",
     setup: ["Polia alta ou média, corda.", "De costas para a polia, um pé à frente, tronco levemente inclinado.", "Cotovelos apontados para frente, ao lado da cabeça."],
     exec: ["Estenda os cotovelos até quase travar, abrindo a corda no final.", "Volte deixando as mãos irem atrás da cabeça, alongando o tríceps.", "Cotovelo fica parado — só o antebraço se move."],
     breath: "Expira estendendo.",
@@ -673,14 +719,14 @@ const EX = {
     tempo: "2s volta · 1s estende",
     errors: ["Cotovelos abrindo para os lados.", "Cotovelo descendo e virando pullover.", "Amplitude curta no alongamento — é justamente a parte que importa aqui.", "Tronco balançando."],
     cue: "Cotovelo fixo, antebraço vira dobradiça.",
-    progress: "Faixa 8–12. 12/12/12 com RIR 1 → sobe uma placa.",
+    progress: "Use a faixa do dia (8–12 no A, 10–15 no D). Topo em todas as séries com RIR 1 → sobe uma placa.",
   },
   pullup: {
     name: "Barra fixa (pull-up)",
     equip: "Barra fixa (assistida se necessário)",
     primary: ["lats"], secondary: ["upBack", "biceps", "forearm"],
     target: "Grande dorsal", sec: "Redondo maior, romboides, bíceps",
-    goal: "Abre o Pull A como movimento vertical pesado. Puxada com peso corporal permite carga alta na região alongada do dorsal, que é onde seu V fecha cedo demais.",
+    goal: "Abre o B como movimento vertical pesado. Puxada com peso corporal permite carga alta na região alongada do dorsal, que é onde seu V fecha cedo demais.",
     setup: ["Pegada pronada, um pouco mais aberta que os ombros.", "Ative a escápula antes de dobrar o cotovelo: 'baixe os ombros' pendurado.", "Corpo levemente inclinado para trás, pernas cruzadas e firmes."],
     exec: ["Puxe levando o peito em direção à barra, cotovelo descendo para as costelas.", "Suba até o queixo passar a barra sem esticar o pescoço.", "Desça controlado até extensão quase completa, sem 'largar'."],
     breath: "Expira subindo, inspira descendo.",
@@ -755,7 +801,7 @@ const EX = {
     equip: "Banco 45–60° + halteres",
     primary: ["biceps"], secondary: ["forearm"],
     target: "Bíceps (cabeça longa)", sec: "Braquial, antebraço",
-    goal: "Com o braço atrás do tronco, a cabeça longa do bíceps fica alongada. Como o bíceps foi mantido em 10 séries (é ponto forte), cada série precisa render mais.",
+    goal: "Com o braço atrás do tronco, a cabeça longa do bíceps fica alongada. Aparece no B e fecha o bíceps no D, completando a rosca direta (meio da amplitude) e a Scott (encurtado).",
     setup: ["Banco em 45–60°. Costas apoiadas, ombro relaxado.", "Braços pendendo livres atrás da linha do tronco.", "Pegada supinada."],
     exec: ["Suba flexionando só o cotovelo, sem levar o cotovelo à frente.", "Aperte no topo sem chegar à vertical (perde tensão).", "Desça até extensão completa, sentindo o alongamento."],
     breath: "Expira subindo.",
@@ -763,7 +809,7 @@ const EX = {
     tempo: "1s sobe · 2–3s desce",
     errors: ["Trazer o cotovelo à frente e tirar o alongamento.", "Ombro rolando para frente.", "Não estender totalmente embaixo.", "Impulso levantando as costas do banco."],
     cue: "Cotovelo atrás do corpo o tempo todo.",
-    progress: "Faixa 8–12. 12/12/12 com RIR 1 → sobe 1–2 kg por halter.",
+    progress: "Use a faixa do dia (8–12 no B, 10–12 no D). Topo em todas as séries com RIR 1 → sobe 1–2 kg por halter.",
   },
   hammer: {
     name: "Hammer Curl (rosca martelo)",
@@ -905,7 +951,7 @@ const EX = {
     equip: "Máquina de elevação lateral (ou halteres, se não houver)",
     primary: ["deltLat"], secondary: ["traps"],
     target: "Deltoide lateral", sec: "Trapézio superior",
-    goal: "Segundo exercício do Push B — subiu de posição de propósito. Você já treinava 14 séries de lateral por semana e reclamou que 'melhorou mas não chegou onde queria': o problema não era volume, era o lateral entrar sempre fatigado, depois de 6 séries de press.",
+    goal: "Terceira lateral do A1. A máquina mantém a carga parecida em toda a amplitude e completa o halter (carga no topo) e o cabo baixo (carga embaixo). Sem máquina livre, use o cabo na altura da cintura, que também carrega bem a parte de baixo.",
     setup: ["Ajuste o banco para que o eixo da máquina fique na linha do ombro.", "Antebraços ou punhos nos coxins, cotovelos levemente à frente do tronco.", "Costas apoiadas, sem empurrar com as pernas."],
     exec: ["Suba até um pouco acima da linha do ombro.", "Pausa curta no topo.", "Desça em 2–3s até quase encostar a placa."],
     breath: "Expira subindo.",
@@ -913,14 +959,14 @@ const EX = {
     tempo: "1s sobe · 1s topo · 2–3s desce",
     errors: ["Impulso de tronco batendo no encosto.", "Encolher o ombro.", "Não usar a excêntrica.", "Parar na altura do ombro por medo do trapézio."],
     cue: "Sobe com o cotovelo, ombro longe da orelha.",
-    progress: "Faixa 10–15. 15 nas 4 séries com RIR 1 → próxima placa.",
+    progress: "Faixa 12–20. Topo da faixa nas 3 séries com RIR 0–1 → próxima placa.",
   },
   supino_incl_smith: {
     name: "Supino inclinado na máquina/Smith",
     equip: "Smith ou máquina inclinada",
     primary: ["chestUp"], secondary: ["deltFront", "triceps"],
     target: "Peitoral (porção clavicular)", sec: "Deltoide anterior, tríceps",
-    goal: "Segundo estímulo semanal de peitoral superior, guiado. Vem depois da elevação lateral no Push B porque o ombro é a prioridade da sessão, não o peito.",
+    goal: "Segundo estímulo semanal de peitoral superior, guiado. Vem depois das três laterais no A1 porque o ombro é a prioridade do dia, não o peito. Também cobre o deltoide anterior, por isso a elevação frontal ficou de fora.",
     setup: ["Banco em 30–35°, alinhado para a barra descer na parte alta do peito.", "Escápulas retraídas, pés firmes.", "Pegada pouco mais aberta que os ombros."],
     exec: ["Desça até tocar levemente ou chegar a 1–2 cm do peito alto.", "Empurre até quase estender.", "Mantenha o peito alto o tempo todo."],
     breath: "Inspira descendo, expira empurrando.",
@@ -928,14 +974,14 @@ const EX = {
     tempo: "2s desce · 1s empurra",
     errors: ["Barra descendo na linha do pescoço.", "Quicar a barra no peito.", "Perder a retração escapular.", "Inclinação alta demais."],
     cue: "Barra na clavícula baixa, peito alto.",
-    progress: "Faixa 8–12. 12/12/12 com RIR 1 → sobe 2,5–5 kg.",
+    progress: "Faixa 6–10. 10/10/10 com RIR 1–2 → sobe 2,5–5 kg.",
   },
   tri_pushdown: {
     name: "Tríceps Pushdown",
     equip: "Polia alta + barra ou corda",
     primary: ["triceps"], secondary: [],
     target: "Tríceps (cabeças lateral e medial)", sec: "—",
-    goal: "Único exercício direto de tríceps do Push B — o skullcrusher foi cortado e as séries realocadas. Complementa o overhead: aqui o foco é a contração encurtada.",
+    goal: "Abre o D com carga pesada. Braço ao lado do corpo, foco na contração. Complementa a overhead, que trabalha o tríceps alongado.",
     setup: ["De frente para a polia alta, um passo atrás.", "Cotovelos ao lado do tronco, colados.", "Leve inclinação do tronco à frente, core firme."],
     exec: ["Estenda até travar levemente, apertando 1s.", "Volte até o cotovelo passar 90°, sem deixar o cotovelo subir."],
     breath: "Expira estendendo.",
@@ -943,14 +989,14 @@ const EX = {
     tempo: "1s estende · 1s aperta · 2s volta",
     errors: ["Cotovelo saindo do lado do corpo.", "Usar o peso do tronco para empurrar.", "Amplitude curta.", "Ombro rolando à frente."],
     cue: "Cotovelo grudado, só o antebraço se move.",
-    progress: "Faixa 8–12. 12/12/12 com RIR 1 → próxima placa.",
+    progress: "Faixa 6–10. 10/10/10 com RIR 1–2 → próxima placa.",
   },
   pulldown_aberto: {
     name: "Lat Pulldown pegada pronada aberta",
     equip: "Puxador alto + barra longa",
     primary: ["lats"], secondary: ["upBack", "biceps"],
     target: "Grande dorsal (adução)", sec: "Redondo maior, romboides",
-    goal: "Pegada aberta afasta o cotovelo do tronco e aumenta o componente de adução — a função do dorsal mais ligada à largura. Complementa a pegada neutra do Pull A.",
+    goal: "Pegada aberta afasta o cotovelo do tronco e aumenta o componente de adução — a função do dorsal mais ligada à largura. Complementa a pegada neutra do B.",
     setup: ["Pegada pronada, cerca de 1,5× a largura dos ombros.", "Coxins firmes nas coxas.", "Tronco quase vertical."],
     exec: ["Puxe até a clavícula, cotovelo descendo em arco.", "Volte permitindo alongamento completo e elevação escapular."],
     breath: "Expira puxando.",
@@ -995,7 +1041,7 @@ const EX = {
     equip: "Máquina de pullover ou polia alta",
     primary: ["lats"], secondary: ["abs", "triceps"],
     target: "Grande dorsal", sec: "Core, tríceps cabeça longa",
-    goal: "Isolador de dorsal em amplitude ampla, sem bíceps. Finalização do Pull B com o dorsal já pré-fatigado.",
+    goal: "Isolador de dorsal em amplitude ampla, sem bíceps. Finalização do B2 com o dorsal já pré-fatigado.",
     setup: ["Se for máquina: cotovelos nos coxins, quadril estável.", "Se for cabo: em pé, tronco inclinado, braços estendidos acima.", "Core firme para a lombar não compensar."],
     exec: ["Puxe em arco até a barra/pegada chegar próxima às coxas.", "Aperte o dorsal 1s.", "Volte alongando até acima da cabeça."],
     breath: "Expira puxando.",
@@ -1010,7 +1056,7 @@ const EX = {
     equip: "Máquina Scott / banco Scott",
     primary: ["biceps"], secondary: ["forearm"],
     target: "Bíceps (cabeça curta)", sec: "Braquial",
-    goal: "Complementa a rosca inclinada do Pull A: aqui o braço fica à frente do tronco, favorecendo a cabeça curta e a contração encurtada. Duas posições diferentes cobrindo o bíceps inteiro com poucas séries.",
+    goal: "Segundo exercício de bíceps do D. Braço à frente do tronco, foco na cabeça curta e na contração encurtada. Junto com a rosca direta (meio da amplitude) e a inclinada (alongado), cobre o bíceps inteiro.",
     setup: ["Axila apoiada no topo do banco, ombro estável.", "Pegada supinada, cotovelos alinhados com o eixo.", "Peito encostado, sem levantar."],
     exec: ["Suba até a contração máxima sem deixar o cotovelo sair do apoio.", "Desça até extensão quase completa, controlando bastante."],
     breath: "Expira subindo.",
@@ -1018,7 +1064,7 @@ const EX = {
     tempo: "1s sobe · 2–3s desce",
     errors: ["Descer rápido e 'largar' na extensão — risco de lesão.", "Levantar o corpo do apoio.", "Amplitude curta em cima.", "Punho quebrando para trás."],
     cue: "Desce devagar até quase esticar.",
-    progress: "Faixa 8–12. 12/12/12 com RIR 1 → próxima placa.",
+    progress: "Faixa 10–15. 15/15/15 com RIR 0–1 → próxima placa.",
   },
   pinwheel: {
     name: "Pinwheel / Hammer Curl",
@@ -1048,7 +1094,7 @@ const EX = {
     tempo: "3s desce · sobe controlado",
     errors: ["Arredondar a lombar no fundo (o erro que machuca).", "Transformar em agachamento dobrando muito o joelho.", "Barra longe do corpo.", "Hiperextender a lombar no topo.", "Levar à falha."],
     cue: "Quadril para trás, barra raspando a coxa.",
-    progress: "Faixa 6–10. 10/10/10 com RIR 1–2 e lombar neutra → sobe 2,5–5 kg.",
+    progress: "Faixa 8–10. 10/10/10 com RIR 2 e lombar neutra → sobe 2,5–5 kg.",
   },
   flexora: {
     name: "Flexora sentada ou deitada",
@@ -1070,7 +1116,7 @@ const EX = {
     equip: "Banco + barra, ou máquina de hip thrust",
     primary: ["glutes"], secondary: ["hams"],
     target: "Glúteo máximo", sec: "Isquiotibiais",
-    goal: "Glúteo desenvolvido melhora a linha lateral do físico e é peça de proporção — não é opcional numa estética masculina completa. Carrega o glúteo na contração encurtada, complementando o RDL.",
+    goal: "Abre o C. Carrega o glúteo contraído com muita carga e pouca exigência técnica. Num estudo que comparou os dois direto, hip thrust e agachamento cresceram o glúteo de forma parecida, então trocar o agachamento por ele não te custa nada. O búlgaro vem depois para carregar o glúteo alongado.",
     setup: ["Borda do banco na linha das escápulas.", "Pés na largura do quadril, canela vertical no topo do movimento.", "Almofada na barra, queixo levemente para baixo, costelas para baixo."],
     exec: ["Suba estendendo o quadril até o tronco ficar paralelo ao chão.", "Aperte o glúteo 1–2s no topo.", "Desça controlado sem encostar totalmente o peso no chão."],
     breath: "Expira subindo, sem prender o ar em excesso.",
@@ -1078,7 +1124,7 @@ const EX = {
     tempo: "1s sobe · 1–2s topo · 2s desce",
     errors: ["Hiperextender a lombar em vez de estender o quadril (o erro nº 1).", "Canela inclinada demais no topo.", "Queixo estendido para trás.", "Amplitude curta com muita carga."],
     cue: "Costela para baixo, aperta o glúteo no topo.",
-    progress: "Faixa 8–12. 12/12/12 com RIR 1 → sobe 5–10 kg.",
+    progress: "Faixa 6–10. 10 reps nas 4 séries com RIR 1–2 → sobe 5–10 kg.",
   },
   pant_sentada: {
     name: "Panturrilha sentada",
@@ -1100,7 +1146,7 @@ const EX = {
     equip: "Barra fixa ou paralelas",
     primary: ["abs"], secondary: ["obl"],
     target: "Reto abdominal (porção inferior)", sec: "Oblíquos, flexores do quadril",
-    goal: "Segundo bloco semanal de abdômen. A porção inferior do reto abdominal responde melhor a movimento de pelve; se joelho flexionado for necessário no começo, tudo bem.",
+    goal: "Opcional, no fim do B, nos dias em que sobrar tempo. Complementa o abdominal na polia do D: lá a coluna enrola, aqui é a pelve que sobe. Joelho flexionado no começo, tudo bem.",
     setup: ["Pendurado na barra, ombros ativos (não 'largado').", "Pernas juntas, corpo estável.", "Se for difícil, use paralelas com apoio de antebraço."],
     exec: ["Suba as pernas ENROLANDO a pelve para cima, não apenas flexionando o quadril.", "Suba até a pelve rodar; joelhos flexionados se necessário.", "Desça em 2–3s sem balançar."],
     breath: "Expira subindo.",
@@ -1108,18 +1154,130 @@ const EX = {
     tempo: "1–2s sobe · 2–3s desce",
     errors: ["Balançar o corpo e usar impulso (o erro nº 1).", "Só flexionar o quadril sem enrolar a pelve.", "Descida rápida.", "Ombros passivos pendurados."],
     cue: "Enrola a pelve, não chuta a perna.",
-    progress: "Faixa 8–15. 15/15/15 controladas → passe de joelho flexionado para perna estendida, ou adicione peso entre os pés.",
+    progress: "Faixa 10–15. 15/15/15 controladas → passe de joelho flexionado para perna estendida, ou adicione peso entre os pés.",
+  },
+
+  /* ------------------------------ BLOCO 2 ------------------------------ */
+  crossover_baixo: {
+    name: "Crucifixo no cabo de baixo pra cima",
+    equip: "Crossover / duas polias baixas",
+    primary: ["chestUp"], secondary: ["deltFront"],
+    target: "Peitoral (porção clavicular)", sec: "Deltoide anterior",
+    goal: "Entrou no lugar da elevação frontal. O braço sobe e fecha ao mesmo tempo, que é a função do peitoral superior, sua prioridade nº 3. Também trabalha o deltoide anterior, então o que a frontal dava continua aqui. Repõe o volume de peito superior que o dia de ombro tirou.",
+    setup: ["Polias na posição mais baixa, pegada simples.", "Um passo à frente, tronco levemente inclinado, peito alto.", "Braços abaixo e ao lado do quadril, cotovelo levemente flexionado e fixo."],
+    exec: ["Suba as mãos em arco, para cima e para dentro.", "Feche na altura do peito alto, apertando 1s.", "Volte devagar até sentir o alongamento no peito alto."],
+    breath: "Expira subindo.",
+    rom: "Das mãos ao lado do quadril até se encontrarem na altura do peito alto.",
+    tempo: "1s sobe · 1s aperta · 2s volta",
+    errors: ["Dobrar e estender o cotovelo, virando supino.", "Subir acima da cabeça e transformar em elevação frontal.", "Ombro rolando à frente.", "Carga alta que tira o arco do movimento."],
+    cue: "Mãos sobem e se encontram no peito alto.",
+    progress: "Faixa 10–15. 15/15/15 com RIR 1 → próxima placa.",
+  },
+  supino_fechado: {
+    name: "Supino fechado",
+    short: "Supino fechado",
+    equip: "Barra, Smith ou paralelas",
+    primary: ["triceps"], secondary: ["chestMid", "deltFront"],
+    target: "Tríceps", sec: "Peitoral, deltoide anterior",
+    goal: "Composto de tríceps que fecha o bloco de tríceps do D com carga. Pegada na largura dos ombros, não mais fechada que isso: pegada muito estreita força o punho sem ganhar nada. Se preferir, troque por paralelas com o tronco reto.",
+    setup: ["Pegada na largura dos ombros.", "Escápulas encaixadas, pés firmes.", "Cotovelos apontando para os pés, perto do tronco."],
+    exec: ["Desça a barra até a parte baixa do peito.", "Empurre mantendo os cotovelos perto do corpo.", "Estenda quase toda a amplitude, sem travar com impacto."],
+    breath: "Inspira descendo, expira empurrando.",
+    rom: "Até tocar levemente o peito baixo.",
+    tempo: "2s desce · 1s empurra",
+    errors: ["Pegada estreita demais.", "Cotovelos abrindo e virando supino de peito.", "Quicar a barra no peito.", "Ir à falha num composto no fim do treino."],
+    cue: "Cotovelo perto, empurra com o tríceps.",
+    progress: "Faixa 8–12. 12/12 com RIR 2 → sobe 2,5 kg.",
+  },
+  rosca_direta: {
+    name: "Rosca direta com barra",
+    equip: "Barra reta ou W",
+    primary: ["biceps"], secondary: ["forearm"],
+    target: "Bíceps", sec: "Braquial, antebraço",
+    goal: "Abre o bíceps no D com carga alta. Com o braço ao lado do corpo, o bíceps trabalha no meio da amplitude, onde é mais forte. A Scott e a inclinada vêm depois para cobrir as pontas: encurtado e alongado.",
+    setup: ["Em pé, pegada supinada na largura dos ombros.", "Cotovelos ao lado do tronco.", "Joelhos destravados, core firme."],
+    exec: ["Suba sem levar o cotovelo para frente.", "Aperte no topo sem trazer a barra até o queixo.", "Desça até a extensão completa."],
+    breath: "Expira subindo.",
+    rom: "Da extensão completa até a contração, cotovelo parado.",
+    tempo: "1s sobe · 2s desce",
+    errors: ["Balançar o tronco.", "Cotovelos abrindo ou indo à frente.", "Não estender embaixo.", "Carga alta virando roubo."],
+    cue: "Cotovelo colado, tronco parado.",
+    progress: "Faixa 6–10. 10/10/10 com RIR 1–2 → sobe 2 kg.",
+  },
+  bulgaro: {
+    name: "Agachamento búlgaro (foco em glúteo)",
+    short: "Búlgaro",
+    equip: "Banco + halteres",
+    primary: ["glutes"], secondary: ["quads", "add"],
+    target: "Glúteo máximo", sec: "Quadríceps, adutores",
+    goal: "Carrega o glúteo alongado, com o quadril bem flexionado, que é onde ele mais cresce. Complementa o hip thrust, que carrega o glúteo contraído. Passo longo e tronco à frente puxam o trabalho para o glúteo; passo curto e tronco reto puxam para o quadríceps. Se não encaixar, use o substituto.",
+    setup: ["Peito do pé de trás apoiado no banco.", "Passo longo à frente: no fundo, a canela da frente fica quase vertical.", "Halteres ao lado do corpo, tronco inclinado uns 30° à frente."],
+    exec: ["Desça reto até a coxa da frente ficar paralela ao chão ou um pouco abaixo.", "Sinta o alongamento no glúteo da perna da frente.", "Suba empurrando o chão com o calcanhar da frente.", "Termine todas as reps de um lado antes de trocar."],
+    breath: "Inspira descendo, expira subindo.",
+    rom: "Desça fundo. É o fundo que faz o glúteo crescer, não a parte de cima.",
+    tempo: "2–3s desce · sobe controlado",
+    errors: ["Passo curto demais, virando exercício de quadríceps.", "Empurrar com a perna de trás.", "Joelho da frente caindo para dentro.", "Descer pouco por excesso de carga."],
+    cue: "Passo longo, peito à frente, desce fundo.",
+    progress: "Faixa 8–12 por perna. 12/12/12 dos dois lados com RIR 1–2 → sobe 2 kg por halter.",
+  },
+  leg_press_uni: {
+    name: "Leg press 90° unilateral (pé alto)",
+    short: "Leg press unilateral",
+    equip: "Leg press 90° ou 45°",
+    primary: ["glutes"], secondary: ["quads", "hams"],
+    target: "Glúteo máximo", sec: "Quadríceps, posteriores",
+    goal: "Substituto do búlgaro com estímulo parecido no glúteo: quadril bem flexionado e carga na posição alongada. Perde só a exigência de equilíbrio, que não faz diferença para o seu objetivo. Funciona com duas condições: pé alto na plataforma e descida funda.",
+    setup: ["Uma perna por vez, pé na parte alta da plataforma.", "Pé na linha do quadril ou um pouco para fora.", "Quadril e lombar colados no banco. A outra perna fica apoiada fora da plataforma."],
+    exec: ["Desça até a coxa chegar perto do peito.", "Pare antes de o quadril descolar do banco.", "Empurre pelo calcanhar até quase estender, sem travar o joelho."],
+    breath: "Inspira descendo, expira empurrando.",
+    rom: "A mais funda possível com o quadril colado. Se o quadril enrola e sai do banco, a amplitude acabou ali.",
+    tempo: "2–3s desce · 1s empurra",
+    errors: ["Pé no meio ou embaixo da plataforma, virando exercício de quadríceps.", "Descer pouco.", "Quadril descolando do banco no fundo.", "Travar o joelho no topo."],
+    cue: "Pé alto, coxa no peito, quadril colado.",
+    progress: "Faixa 8–12 por perna. 12/12/12 dos dois lados com RIR 1–2 → próxima placa.",
+  },
+  abdutora: {
+    name: "Cadeira abdutora (tronco à frente)",
+    equip: "Abdutora",
+    primary: ["glutes"], secondary: [],
+    target: "Glúteo médio e parte de cima do glúteo máximo", sec: "Tensor da fáscia lata",
+    goal: "Trabalha a parte de cima e de lado do glúteo, que é o que deixa ele mais projetado visto de lado. Inclinar o tronco à frente tende a puxar mais a parte de cima do glúteo máximo. Custa pouco em recuperação, por isso aparece no C e no D.",
+    setup: ["Sente no fundo do banco.", "Incline o tronco à frente, segurando nas alças ou na própria máquina.", "Coxins do lado de fora dos joelhos."],
+    exec: ["Abra as pernas o máximo que conseguir.", "Segure 1s aberto.", "Volte controlando, sem deixar as placas baterem."],
+    breath: "Expira abrindo.",
+    rom: "Abertura máxima, volta até quase fechar.",
+    tempo: "1s abre · 1s segura · 2s volta",
+    errors: ["Usar impulso do tronco.", "Amplitude curta com muita carga.", "Voltar em queda livre.", "Tronco encostado no banco, perdendo a parte de cima do glúteo."],
+    cue: "Tronco à frente, abre e segura.",
+    progress: "Faixa 12–20. Topo da faixa em todas as séries com RIR 0–1 → próxima placa.",
+  },
+  cardio: {
+    name: "Cardio leve (esteira inclinada ou bike)",
+    equip: "Esteira, bike ou escada",
+    primary: [], secondary: ["quads", "calves"],
+    target: "Gasto calórico do cutting", sec: "Condicionamento",
+    goal: "Fixo no fim do D porque sábado é o dia com mais tempo, o que diminui a chance de pular. Ritmo leve não atrapalha a recuperação das pernas e ajuda o déficit do cutting. Duração e frequência alinhadas com o nutricionista.",
+    setup: ["Esteira com inclinação de 8–12%, ou bike com carga leve.", "Velocidade em que você consegue conversar em frases completas."],
+    exec: ["Mantenha o ritmo constante do início ao fim.", "Na esteira, não segure no apoio: isso tira o gasto do exercício."],
+    breath: "Se dá para conversar, a intensidade está certa.",
+    rom: "Não se aplica.",
+    tempo: "20–30 min contínuos",
+    errors: ["Correr forte e transformar em treino intenso.", "Segurar no apoio da esteira.", "Pular porque o treino de braço demorou."],
+    cue: "Ritmo de conversa, sem segurar.",
+    progress: "Não progride por conta própria. Mais tempo ou mais sessões só com o nutricionista.",
   },
 };
 
 /* -------------------------------- PROGRAMA ------------------------------- */
-const e = (id, sets, reps, rir, rest, restSec, prio, note) => ({ id, sets, reps, rir, rest, restSec, prio, note });
+const e = (id, sets, reps, rir, rest, restSec, prio, note, x = {}) => ({ id, sets, reps, rir, rest, restSec, prio, note, ...x });
 
+/* Bloco 2 (nov/2026, dieta em cutting). Ordem: A · B · C · B2 · A1 · D.
+   As keys antigas foram mantidas para não perder o histórico salvo no aparelho. */
 const PROGRAM = [
   {
-    key: "pushA", day: "SEG", name: "Push A", app: "hevy",
+    key: "pushA", day: "SEG", name: "A · Push", app: "hevy",
     focus: "Peitoral superior + deltoide lateral",
-    goal: "Abrir a semana com o deltoide lateral descansado. É a mudança mais importante do programa: seu lateral tinha volume suficiente, mas sempre entrava fatigado depois de 6 séries de press.",
+    goal: "Abrir a semana com o deltoide lateral descansado. Continua igual ao bloco anterior: o lateral entra antes de qualquer press.",
     dur: "70–80 min", sets: 18,
     prios: ["Deltoide lateral", "Peitoral superior"],
     ex: [
@@ -1132,9 +1290,9 @@ const PROGRAM = [
     ],
   },
   {
-    key: "pullA", day: "TER", name: "Pull A", app: "hevy",
+    key: "pullA", day: "TER", name: "B · Pull", app: "hevy",
     focus: "Costas com prioridade em largura",
-    goal: "Atacar a porção inferior do dorsal — onde seu V-taper fecha cedo demais. Vetores verticais e extensão de ombro, não retração escapular.",
+    goal: "Atacar a porção inferior do dorsal, onde seu V-taper fecha cedo demais. Vetores verticais e extensão de ombro, não retração escapular. Se sobrar tempo, abdômen opcional no fim.",
     dur: "75–85 min", sets: 19,
     prios: ["Dorsais / largura", "Deltoide posterior"],
     ex: [
@@ -1145,44 +1303,30 @@ const PROGRAM = [
       e("reverse_pec", 3, "12–20", "0–1", "60–90s", 75, "B"),
       e("rosca_inclinada", 3, "8–12", "1", "90s", 90, "C"),
       e("hammer", 2, "10–15", "0–1", "60–90s", 75, "C"),
+      e("hanging_leg", 3, "10–15", "1", "60–90s", 75, "C", "Opcional: só se sobrar tempo. O abdominal fixo da semana é no D.", { opt: true }),
     ],
   },
   {
-    key: "legsA", day: "QUA", name: "Legs A", app: "stronger",
-    focus: "Quadríceps + panturrilha + abdômen",
-    goal: "Pernas não são ponto fraco — são proporcionais. O objetivo aqui é progressão consistente sem consumir a recuperação dos grupos prioritários.",
-    dur: "75–85 min", sets: 21,
-    prios: ["Quadríceps", "Panturrilha", "Abdômen"],
+    key: "legsA", day: "QUA", name: "C · Pernas", app: "stronger",
+    focus: "Glúteo + manutenção de coxa + panturrilha",
+    goal: "Único dia de perna da semana. O foco é deixar o glúteo mais projetado; quadríceps e posterior ficam em manutenção porque já são pontos fortes. Hack e agachamento saíram: davam pouco estímulo pra você. Aquecimento: 5 min de bike + 2 séries leves de hip thrust.",
+    dur: "80–90 min", sets: 23,
+    prios: ["Glúteo", "Panturrilha"],
     ex: [
-      e("agacho", 3, "6–10", "2→1", "3 min", 180, "B", "RIR 2 de propósito. Não vá à falha aqui."),
-      e("leg_press", 3, "10–15", "1", "2–3 min", 150, "B"),
-      e("extensora", 3, "10–15", "0–1", "90s", 90, "B"),
-      e("flexora_sentada", 3, "8–12", "1", "90–120s", 105, "B"),
-      e("adutora", 2, "10–15", "1", "90s", 90, "C", "Inclusão deliberada: adutor magno engrossa a coxa de frente."),
+      e("hip_thrust", 4, "6–10", "1–2", "2–3 min", 150, "B", "Segura 1s no topo."),
+      e("bulgaro", 3, "8–12", "1–2", "2 min", 120, "B", "Por perna. Toque no exercício para trocar pelo substituto.", { alt: "leg_press_uni" }),
+      e("rdl", 3, "8–10", "2", "2–3 min", 150, "B", "A lombar arredondar define o fim da amplitude."),
+      e("abdutora", 3, "12–20", "0–1", "60–90s", 75, "B", "Tronco inclinado à frente."),
+      e("flexora_sentada", 3, "8–12", "1", "90–120s", 105, "C", "Manutenção."),
+      e("extensora", 3, "10–15", "0–1", "90s", 90, "C", "Manutenção. Pega o reto femoral, que o agachamento quase não trabalha."),
       e("pant_pe", 4, "8–12", "0–1", "90s", 90, "A", "BLOCO OBRIGATÓRIO. Pausa embaixo, sem quique."),
-      e("cable_crunch", 3, "8–15", "1", "60–90s", 75, "A", "BLOCO OBRIGATÓRIO."),
     ],
   },
   {
-    key: "pushB", day: "QUI", name: "Push B", app: "hevy",
-    focus: "Ombros dominantes",
-    goal: "A sessão que mais muda seu físico visto de frente. Elevação lateral vem em 2º, logo após o press, e não em 3º depois de 6 séries de empurrar.",
-    dur: "70–80 min", sets: 18,
-    prios: ["Deltoide lateral", "Peitoral superior"],
-    ex: [
-      e("shoulder_press_maq", 3, "6–10", "1–2", "2–3 min", 150, "B"),
-      e("elev_maq", 4, "10–15", "1", "90s", 90, "A", "Subiu de posição. Aqui está o ganho do programa."),
-      e("supino_incl_smith", 3, "8–12", "1", "2 min", 120, "B"),
-      e("elev_cabo_uni", 3, "12–20", "0–1", "60–90s", 75, "A"),
-      e("reverse_pec", 2, "12–20", "0–1", "60–90s", 75, "B"),
-      e("tri_pushdown", 3, "8–12", "1", "90s", 90, "C"),
-    ],
-  },
-  {
-    key: "pullB", day: "SEX", name: "Pull B", app: "hevy",
+    key: "pullB", day: "QUI", name: "B2 · Pull", app: "hevy",
     focus: "Largura + espessura",
-    goal: "Segundo dia de costas, com viés mais horizontal. Fecha 22 séries semanais de costas — a segunda maior prioridade do bloco.",
-    dur: "75–85 min", sets: 19,
+    goal: "Segundo dia de costas, com viés mais horizontal. Fecha 22 séries semanais de costas. Sem rosca aqui: o bíceps tem dia próprio no sábado e precisa chegar descansado.",
+    dur: "55–65 min", sets: 13,
     prios: ["Dorsais", "Upper back"],
     ex: [
       e("pulldown_aberto", 3, "8–12", "1", "2 min", 120, "A"),
@@ -1190,49 +1334,68 @@ const PROGRAM = [
       e("seated_row", 3, "10–15", "1", "2 min", 120, "A"),
       e("pullover", 2, "10–15", "0–1", "90s", 90, "B"),
       e("reverse_pec", 2, "12–20", "0–1", "60–90s", 75, "B"),
-      e("rosca_scott", 3, "8–12", "1", "90s", 90, "C"),
-      e("pinwheel", 2, "10–15", "0–1", "60–90s", 75, "C"),
     ],
   },
   {
-    key: "legsB", day: "SÁB", name: "Legs B", app: "stronger",
-    focus: "Posterior + glúteos + panturrilha + abdômen",
-    goal: "Posterior de coxa e glúteo, mais o segundo bloco obrigatório de panturrilha e abdômen. Extensora foi cortada: o quadríceps já recebe 12 séries semanais.",
-    dur: "75–85 min", sets: 19,
-    prios: ["Posteriores", "Glúteos", "Panturrilha"],
+    key: "pushB", day: "SEX", name: "A1 · Ombros", app: "hevy",
+    focus: "Deltoide lateral em 3 ângulos + peitoral superior",
+    goal: "Dia de ombro. Três elevações laterais com curvas de resistência diferentes: o halter carrega o topo, o cabo baixo carrega a parte de baixo e a máquina mantém a carga constante. Lateral sobe para 16 séries na semana. A elevação frontal ficou de fora: o supino inclinado já cobre o deltoide anterior.",
+    dur: "70–80 min", sets: 18,
+    prios: ["Deltoide lateral", "Peitoral superior", "Deltoide posterior"],
     ex: [
-      e("rdl", 3, "6–10", "1–2", "3 min", 180, "B", "A lombar arredondar define o fim da amplitude."),
-      e("flexora", 3, "8–12", "1", "2 min", 120, "B"),
-      e("hip_thrust", 3, "8–12", "1", "2 min", 120, "B"),
-      e("leg_press", 3, "10–15", "1", "2 min", 120, "C"),
+      e("elev_halt", 3, "10–15", "0–1", "60–90s", 75, "A", "Abre o dia. Pare antes de encostar na coxa para manter a tensão."),
+      e("elev_cabo_uni", 3, "12–15", "0–1", "60–90s", 75, "A"),
+      e("elev_maq", 3, "12–20", "0", "60–90s", 75, "A", "Sem máquina livre: cabo na altura da cintura."),
+      e("supino_incl_smith", 3, "6–10", "1–2", "2–3 min", 150, "B"),
+      e("crossover_baixo", 3, "10–15", "1", "90s", 90, "B", "Entrou no lugar da elevação frontal."),
+      e("reverse_pec", 3, "12–20", "0–1", "60–90s", 75, "B"),
+    ],
+  },
+  {
+    key: "armsD", day: "SÁB", name: "D · Braços", app: "hevy",
+    focus: "Tríceps + bíceps + glúteo + panturrilha + abdômen + cardio",
+    goal: "Sábado tem mais tempo, então é aqui que o cardio não pode ser pulado. Braço acompanha o ombro que está crescendo. Tríceps sobe de 6 para 11 séries na semana: nas 2 primeiras semanas, faça só 2 séries por exercício de tríceps.",
+    dur: "85–100 min", sets: 26,
+    prios: ["Tríceps", "Bíceps", "Cardio"],
+    ex: [
+      e("tri_pushdown", 3, "6–10", "1–2", "90–120s", 105, "B", "Carga pesada. Primeiras 2 semanas: 2 séries."),
+      e("tri_overhead", 3, "10–15", "0–1", "90s", 90, "B"),
+      e("supino_fechado", 2, "8–12", "2", "2 min", 120, "C", "Ou paralelas, se preferir."),
+      e("rosca_direta", 3, "6–10", "1–2", "90–120s", 105, "B"),
+      e("rosca_scott", 3, "10–15", "0–1", "60–90s", 75, "B"),
+      e("rosca_inclinada", 2, "10–12", "1", "60–90s", 75, "C"),
+      e("abdutora", 3, "12–20", "0–1", "60s", 60, "C", "Segundo estímulo de glúteo na semana."),
       e("pant_sentada", 4, "10–15", "0–1", "90s", 90, "A", "BLOCO OBRIGATÓRIO. Foco no sóleo."),
-      e("hanging_leg", 3, "8–15", "1", "60–90s", 75, "A", "BLOCO OBRIGATÓRIO."),
+      e("cable_crunch", 3, "8–15", "1", "60–90s", 75, "A", "BLOCO OBRIGATÓRIO."),
+      e("cardio", 1, "20–30", "—", "—", 0, "A", "Fecha o treino. Ritmo de conversa.", { unit: "min" }),
     ],
   },
 ];
 
 const VOLUME = [
-  { m: "Deltoide lateral", s: 14, tag: "A", note: "Especialização — e agora em posição prioritária" },
-  { m: "Dorsais / costas", s: 22, tag: "A", note: "Especialização distribuída em 2 sessões" },
-  { m: "Peitoral", s: 11, tag: "B", note: "Reduzido de ~17 — era volume em ponto forte" },
-  { m: "Quadríceps", s: 12, tag: "B", note: "Desenvolvimento, sem roubar recuperação" },
-  { m: "Posteriores", s: 9, tag: "B", note: "RDL + duas flexoras" },
-  { m: "Bíceps", s: 10, tag: "C", note: "Ponto forte — manutenção alta" },
-  { m: "Deltoide posterior", s: 7, tag: "B", note: "3× por semana, recuperação rápida" },
-  { m: "Panturrilha", s: 8, tag: "A", note: "Era 0. Corrigindo negligência" },
-  { m: "Tríceps", s: 6, tag: "C", note: "Reduzido de 10 — realocado para lateral" },
-  { m: "Abdômen", s: 6, tag: "B", note: "Era 0–3. Agora com carga progressiva" },
+  { m: "Deltoide lateral", s: 16, tag: "A", note: "7 no A + 9 no A1, em três ângulos diferentes" },
+  { m: "Dorsais / costas", s: 22, tag: "A", note: "Especialização distribuída em B e B2" },
+  { m: "Peitoral", s: 14, tag: "B", note: "Subiu pelo peitoral superior: crucifixo de baixo pra cima no A1" },
+  { m: "Bíceps", s: 13, tag: "B", note: "5 no B + 8 no D. Sem rosca no B2" },
+  { m: "Glúteo", s: 13, tag: "B", note: "Foco do C + abdutora no D. Sem pressa" },
+  { m: "Tríceps", s: 11, tag: "B", note: "Subiu de 6 com o dia D. Começa com 2 séries por exercício" },
+  { m: "Deltoide posterior", s: 8, tag: "B", note: "3× por semana, recuperação rápida" },
+  { m: "Panturrilha", s: 8, tag: "A", note: "C + D, quarta e sábado" },
+  { m: "Quadríceps", s: 6, tag: "C", note: "Manutenção: búlgaro + extensora" },
+  { m: "Posteriores", s: 6, tag: "C", note: "Manutenção: RDL + flexora sentada" },
+  { m: "Abdômen", s: 3, tag: "B", note: "Fixo no D. Mais 3 opcionais no fim do B" },
 ];
 
 const WEDGE = [
   { lbl: "Deltoide lateral", w: 100, tier: "A" },
   { lbl: "Dorsais / largura", w: 94, tier: "A" },
-  { lbl: "Upper back", w: 76, tier: "B" },
-  { lbl: "Peitoral superior", w: 70, tier: "B" },
-  { lbl: "Panturrilha", w: 62, tier: "B" },
-  { lbl: "Abdômen", w: 56, tier: "B" },
-  { lbl: "Braços", w: 44, tier: "C" },
-  { lbl: "Pernas", w: 38, tier: "C" },
+  { lbl: "Peitoral superior", w: 72, tier: "B" },
+  { lbl: "Braços", w: 68, tier: "B" },
+  { lbl: "Upper back", w: 64, tier: "B" },
+  { lbl: "Panturrilha", w: 58, tier: "B" },
+  { lbl: "Glúteo", w: 48, tier: "B" },
+  { lbl: "Abdômen", w: 44, tier: "B" },
+  { lbl: "Coxas", w: 28, tier: "C" },
   { lbl: "Cintura", w: 22, tier: "hold" },
 ];
 
@@ -1245,7 +1408,7 @@ const PRE_CHECK = [
 const EX_CHECK = ["Setup correto", "Amplitude completa", "Execução controlada", "RIR planejado", "Carga registrada", "Reps registradas"];
 
 /* ------------------------------- UTILITÁRIOS ------------------------------ */
-const DAYKEY = ["dom", "pushA", "pullA", "legsA", "pushB", "pullB", "legsB"];
+const DAYKEY = ["dom", "pushA", "pullA", "legsA", "pullB", "pushB", "armsD"];
 const todayKey = () => DAYKEY[new Date().getDay()];
 const isoDay = () => new Date().toISOString().slice(0, 10);
 const weekId = () => { const d = new Date(); const t = new Date(d.getFullYear(), 0, 1); return `${d.getFullYear()}-W${Math.ceil(((d - t) / 86400000 + t.getDay() + 1) / 7)}`; };
@@ -1260,7 +1423,9 @@ function copyText(t) {
     return Promise.resolve();
   } catch (err) { return Promise.reject(err); }
 }
-const exLine = (it) => `${EX[it.id].name} — ${it.sets} séries × ${it.reps} reps · RIR ${it.rir} · descanso ${it.rest}`;
+const exLine = (it) => it.unit
+  ? `${EX[it.id].name}: ${it.reps} ${it.unit}`
+  : `${EX[it.id].name}: ${it.sets} séries × ${it.reps} reps · RIR ${it.rir} · descanso ${it.rest}${it.opt ? " (opcional)" : ""}${it.alt ? ` · substituto: ${EX[it.alt].name}` : ""}`;
 const workoutText = (w) =>
   `${w.name.toUpperCase()} — ${w.focus}\n${w.ex.map((it, i) => `${i + 1}. ${exLine(it)}`).join("\n")}\n\nRegistro oficial: ${w.app === "hevy" ? "Hevy" : "Stronger"}`;
 
@@ -1311,23 +1476,27 @@ function RestTimer({ seconds, onClose }) {
 
 /* --------------------------- MODAL DO EXERCÍCIO -------------------------- */
 function ExerciseSheet({ item, workout, onClose, toast, log, addLog, checks, toggleCheck }) {
-  const x = EX[item.id];
+  /* cur = exercício exibido (principal ou substituto). Registro e checklist seguem o que foi feito de verdade. */
+  const [cur, setCur] = useState(item.id);
+  const x = EX[cur];
+  const curItem = cur === item.id ? item : { ...item, id: cur, alt: undefined };
+  const exIdx = workout.ex.findIndex((it) => it.id === item.id || it.alt === item.id) + 1;
   const [tab, setTab] = useState("guia");
   const [timer, setTimer] = useState(false);
   const [w, setW] = useState(""); const [r, setR] = useState(""); const [rr, setRR] = useState(""); const [n, setN] = useState("");
   const ref = useRef(null);
   useEffect(() => { ref.current?.focus(); const h = (ev) => ev.key === "Escape" && onClose(); window.addEventListener("keydown", h); return () => window.removeEventListener("keydown", h); }, [onClose]);
 
-  const entries = (log[item.id] || []).slice().reverse();
+  const entries = (log[cur] || []).slice().reverse();
   const best = entries.reduce((a, b) => (parseFloat(b.w) > parseFloat(a?.w || 0) ? b : a), null);
   const last = entries[0];
-  const ckKey = `${workout.key}:${item.id}`;
+  const ckKey = `${workout.key}:${cur}`;
   const done = checks.ex[ckKey] || {};
   const doneCount = EX_CHECK.filter((c) => done[c]).length;
 
   const save = () => {
     if (!w && !r) return toast("Preencha carga ou reps");
-    addLog(item.id, { d: isoDay(), w, r, rir: rr, n });
+    addLog(cur, { d: isoDay(), w, r, rir: rr, n });
     setW(""); setR(""); setRR(""); setN(""); toast("Registrado");
   };
 
@@ -1359,7 +1528,7 @@ function ExerciseSheet({ item, workout, onClose, toast, log, addLog, checks, tog
           <div className="grab" />
           <div className="between">
             <div style={{ minWidth: 0 }}>
-              <div className="eyebrow">{workout.name} · exercício {workout.ex.indexOf(item) + 1}</div>
+              <div className="eyebrow">{workout.name} · exercício {exIdx}{cur !== item.id ? " · substituto" : ""}</div>
               <h2 className="disp d-m" style={{ marginTop: 6 }}>{x.name}</h2>
             </div>
             <button ref={ref} className="btn sm ghost" onClick={onClose} aria-label="Fechar">{I.x()}</button>
@@ -1371,23 +1540,37 @@ function ExerciseSheet({ item, workout, onClose, toast, log, addLog, checks, tog
 
         <div className="wrap" style={{ paddingTop: 18, paddingBottom: 44 }}>
           <div className="card">
-            <div className="row" style={{ flexWrap: "wrap", gap: 7 }}><PrioPill p={item.prio} /><Pill>{x.equip}</Pill></div>
+            <div className="row" style={{ flexWrap: "wrap", gap: 7 }}><PrioPill p={item.prio} />{item.opt && <Pill>Opcional</Pill>}<Pill>{x.equip}</Pill></div>
+            {item.alt && (
+              <div style={{ marginTop: 14 }}>
+                <div className="eyebrow" style={{ marginBottom: 7 }}>Variação de hoje</div>
+                <div className="row" style={{ gap: 7, flexWrap: "wrap" }}>
+                  {[[item.id, "Principal"], [item.alt, "Substituto"]].map(([id, lbl]) => (
+                    <button key={id} onClick={() => setCur(id)} className="pill" aria-pressed={cur === id}
+                      style={{ padding: "8px 12px", fontSize: 12, background: cur === id ? "var(--accent-dim)" : "var(--surface-2)",
+                        color: cur === id ? "var(--accent)" : "var(--ink-2)", borderColor: cur === id ? "var(--accent-line)" : "var(--line)" }}>
+                      {lbl} · {EX[id].short || EX[id].name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
             <div className="exr-metrics" style={{ marginTop: 14 }}>
-              <Metric v={item.sets} l="séries" /><Metric v={item.reps} l="reps" /><Metric v={item.rir} l="RIR" /><Metric v={item.rest} l="descanso" />
+              <Metric v={item.sets} l="séries" /><Metric v={item.reps} l={item.unit || "reps"} /><Metric v={item.rir} l="RIR" /><Metric v={item.rest} l="descanso" />
             </div>
-            <button className="btn primary" style={{ marginTop: 15 }} onClick={() => setTimer((t) => !t)}>{I.timer()} {timer ? "Fechar timer" : "Iniciar descanso"}</button>
+            {item.restSec > 0 && <button className="btn primary" style={{ marginTop: 15 }} onClick={() => setTimer((t) => !t)}>{I.timer()} {timer ? "Fechar timer" : "Iniciar descanso"}</button>}
             {timer && <RestTimer seconds={item.restSec} onClose={() => setTimer(false)} />}
           </div>
 
           {tab === "guia" && (
             <div className="rise">
-              {FIGMAP[item.id] && (
+              {FIGMAP[cur] && (
                 <div className="figbox" style={{ marginTop: 12, padding: 14 }}>
                   <div className="between" style={{ marginBottom: 4 }}>
                     <div className="eyebrow">Início → final</div>
                     <span className="tiny mut3">esquema animado</span>
                   </div>
-                  <ExFigure exId={item.id} height={186} />
+                  <ExFigure key={cur} exId={cur} height={186} />
                 </div>
               )}
               <div className="card" style={{ marginTop: 12, background: "var(--accent-dim)", borderColor: "var(--accent-line)" }}>
@@ -1420,7 +1603,7 @@ function ExerciseSheet({ item, workout, onClose, toast, log, addLog, checks, tog
               <Block t={`Checklist da série · ${doneCount}/${EX_CHECK.length}`}>
                 <div>{EX_CHECK.map((c) => <Check key={c} label={c} on={!!done[c]} onToggle={() => toggleCheck(ckKey, c)} />)}</div>
               </Block>
-              <button className="btn" style={{ marginTop: 16 }} onClick={() => copyText(exLine(item)).then(() => toast("Exercício copiado")).catch(() => toast("Não foi possível copiar"))}>
+              <button className="btn" style={{ marginTop: 16 }} onClick={() => copyText(exLine(curItem)).then(() => toast("Exercício copiado")).catch(() => toast("Não foi possível copiar"))}>
                 {I.copy()} Copiar informações
               </button>
             </div>
@@ -1432,10 +1615,10 @@ function ExerciseSheet({ item, workout, onClose, toast, log, addLog, checks, tog
                 <div className="eyebrow" style={{ marginBottom: 8 }}>Onde o estímulo cai</div>
                 <BodyMap primary={x.primary} secondary={x.secondary} height={192} />
               </div>
-              {FIGMAP[item.id] && (
+              {FIGMAP[cur] && (
                 <div className="figbox" style={{ marginTop: 12, padding: 14 }}>
                   <div className="eyebrow" style={{ marginBottom: 4 }}>Movimento</div>
-                  <ExFigure exId={item.id} height={168} />
+                  <ExFigure key={cur} exId={cur} height={168} />
                 </div>
               )}
               <div className="grid2" style={{ marginTop: 12 }}>
@@ -1573,6 +1756,7 @@ function WorkoutView({ w, onBack, onOpen, toast, checks, toggleCheck, sessionDon
                         <div className="row" style={{ gap: 7, marginBottom: 4 }}>
                           <span className="num" style={{ fontSize: 11, color: it.prio === "A" ? "var(--accent)" : "var(--ink-3)", letterSpacing: ".1em" }}>{String(i + 1).padStart(2, "0")}</span>
                           {it.prio === "A" && <span className="pill ok" style={{ padding: "2px 7px", fontSize: 9.5 }}>PRIORIDADE</span>}
+                          {it.opt && <span className="pill" style={{ padding: "2px 7px", fontSize: 9.5 }}>OPCIONAL</span>}
                         </div>
                         <div className="disp d-s" style={{ textTransform: "none", fontSize: 16.5, lineHeight: 1.2 }}>{x.name}</div>
                         <div className="tiny mut3" style={{ marginTop: 3 }}>{x.target}</div>
@@ -1580,9 +1764,10 @@ function WorkoutView({ w, onBack, onOpen, toast, checks, toggleCheck, sessionDon
                       <span style={{ color: "var(--ink-3)", flex: "none", paddingTop: 3 }}>{I.chev()}</span>
                     </div>
                     <div className="exr-metrics">
-                      <Metric v={it.sets} l="séries" /><Metric v={it.reps} l="reps" /><Metric v={it.rir} l="RIR" /><Metric v={it.rest} l="desc." />
+                      <Metric v={it.sets} l="séries" /><Metric v={it.reps} l={it.unit || "reps"} /><Metric v={it.rir} l="RIR" /><Metric v={it.rest} l="desc." />
                     </div>
                     {it.note && <div className="tiny" style={{ marginTop: 9, color: "var(--warn)" }}>{it.note}</div>}
+                    {it.alt && <div className="tiny" style={{ marginTop: 6, color: "var(--info)" }}>Substituto disponível: {EX[it.alt].name}</div>}
                   </div>
                 </button>
                 {i < w.ex.length - 1 && <hr className="hair" />}
@@ -1606,7 +1791,7 @@ function Today({ go, openWorkout, checks, counters }) {
   return (
     <div className="wrap rise" style={{ paddingTop: 18 }}>
       <div className="between">
-        <div><div className="eyebrow">{greet} · Bloco 1 · semana de 8</div>
+        <div><div className="eyebrow">{greet} · Bloco 2 · cutting</div>
           <h1 className="disp d-l" style={{ marginTop: 6 }}>Central V-Taper</h1></div>
       </div>
 
@@ -1665,7 +1850,7 @@ function Today({ go, openWorkout, checks, counters }) {
           </div>
           <hr className="hair" style={{ margin: "16px 0 12px" }} />
           <p className="tiny mut3" style={{ margin: 0 }}>
-            Sua cintura já é o maior ativo do físico — ela fica onde está. Todo o ganho de V-taper vem de aumentar o topo da cunha, não de estreitar a base.
+            No cutting, a base da cunha (cintura) diminui com a dieta. O treino garante que o topo, ombro e dorsal, não perca nada no caminho.
           </p>
         </div>
       </div>
@@ -1673,15 +1858,15 @@ function Today({ go, openWorkout, checks, counters }) {
       <div className="sec">
         <SecHd eyebrow="Bloco obrigatório" title="Não pular" />
         <div className="grid2">
-          {[["Panturrilha", counters.calf, "QUA + SÁB"], ["Abdômen", counters.abs, "QUA + SÁB"]].map(([n, v, d]) => (
+          {[["Panturrilha", counters.calf, 2, "QUA (C) + SÁB (D)"], ["Abdômen", counters.abs, 1, "SÁB (D) · TER opcional"], ["Cardio", counters.cardio, 1, "SÁB (D), fim do treino"]].map(([n, v, t, d]) => (
             <div className="card-flat" key={n}>
-              <div className="between"><div className="eyebrow">{n}</div><span className="num" style={{ fontSize: 15, color: v >= 2 ? "var(--accent)" : "var(--ink-2)" }}>{v}/2</span></div>
-              <div className={`bar ${v >= 2 ? "" : "warn"}`} style={{ marginTop: 10 }}><i style={{ width: `${(v / 2) * 100}%` }} /></div>
+              <div className="between"><div className="eyebrow">{n}</div><span className="num" style={{ fontSize: 15, color: v >= t ? "var(--accent)" : "var(--ink-2)" }}>{v}/{t}</span></div>
+              <div className={`bar ${v >= t ? "" : "warn"}`} style={{ marginTop: 10 }}><i style={{ width: `${(v / t) * 100}%` }} /></div>
               <div className="tiny mut3" style={{ marginTop: 8 }}>{d}</div>
             </div>
           ))}
         </div>
-        <p className="tiny mut3" style={{ marginTop: 10 }}>Contador zera toda segunda. Atualiza quando você marca o Legs A ou Legs B como concluído.</p>
+        <p className="tiny mut3" style={{ marginTop: 10 }}>Contador zera toda segunda. Atualiza quando você marca o C ou o D como concluído.</p>
       </div>
 
       <div className="sec">
@@ -1689,7 +1874,7 @@ function Today({ go, openWorkout, checks, counters }) {
         <div className="stack">
           <div className="card-flat" style={{ borderColor: "rgba(255,92,92,.25)" }}>
             <div className="row"><span className="pill a"><i className="dot" />Sono</span><span className="num mut" style={{ fontSize: 13 }}>≈6h → meta 7h</span></div>
-            <p className="small mut" style={{ margin: "10px 0 0" }}>Em 10 meses você ganhou ~1 kg de massa magra treinando 6× por semana. O treino não explica isso sozinho. Meta: 7h em 5 das 7 noites.</p>
+            <p className="small mut" style={{ margin: "10px 0 0" }}>Em cutting, dormir pouco aumenta a chance de perder massa magra junto com a gordura. Meta: 7h em 5 das 7 noites.</p>
           </div>
           <div className="card-flat" style={{ borderColor: "rgba(255,184,77,.25)" }}>
             <div className="row"><span className="pill b"><i className="dot" />Registro de carga</span></div>
@@ -1697,7 +1882,7 @@ function Today({ go, openWorkout, checks, counters }) {
           </div>
           <div className="card-flat" style={{ borderColor: "rgba(106,168,255,.25)" }}>
             <div className="row"><span className="pill info"><i className="dot" />Passos</span><span className="num mut" style={{ fontSize: 13 }}>meta 8.000/dia</span></div>
-            <p className="small mut" style={{ margin: "10px 0 0" }}>Trabalho sentado em bulking. Caminhada não compete com recuperação; cardio estruturado compete. Ele entra depois, se a cintura pedir.</p>
+            <p className="small mut" style={{ margin: "10px 0 0" }}>Trabalho sentado e dieta em cutting. Os passos aumentam o gasto sem competir com a recuperação. O cardio estruturado fica no fim do D, no sábado.</p>
           </div>
         </div>
       </div>
@@ -1710,7 +1895,7 @@ function Week({ openWorkout, sessionDone }) {
   const k = todayKey();
   return (
     <div className="wrap rise" style={{ paddingTop: 18 }}>
-      <div className="eyebrow">Bloco 1 · PPL 2× · 8 semanas</div>
+      <div className="eyebrow">Bloco 2 · 6 dias · cutting</div>
       <h1 className="disp d-l" style={{ marginTop: 6 }}>A semana</h1>
 
       <div className="sec" style={{ marginTop: 20 }}>
@@ -1754,11 +1939,11 @@ function Week({ openWorkout, sessionDone }) {
         <div className="grid2">
           <div className="card-flat" style={{ borderColor: "var(--accent-line)" }}>
             <div className="eyebrow" style={{ color: "var(--accent)" }}>Hevy · superiores</div>
-            <p className="small mut" style={{ margin: "9px 0 0" }}>Push A · Pull A · Push B · Pull B</p>
+            <p className="small mut" style={{ margin: "9px 0 0" }}>A · B · B2 · A1 · D</p>
           </div>
           <div className="card-flat" style={{ borderColor: "rgba(106,168,255,.3)" }}>
             <div className="eyebrow" style={{ color: "var(--info)" }}>Stronger · inferiores</div>
-            <p className="small mut" style={{ margin: "9px 0 0" }}>Legs A · Legs B</p>
+            <p className="small mut" style={{ margin: "9px 0 0" }}>C</p>
           </div>
         </div>
       </div>
@@ -1819,7 +2004,7 @@ function Method() {
         </div>
         <div className="stack" style={{ marginTop: 12 }}>
           {[
-            ["Compostos pesados", "RIR 1–2", "Agacho, RDL, barra fixa, remada curvada, desenvolvimento. O custo em fadiga sistêmica e risco técnico não compensa a falha — ainda mais com 6h de sono."],
+            ["Compostos pesados", "RIR 1–2", "Hip thrust, búlgaro, RDL, barra fixa, supinos. O custo em fadiga e o risco técnico não compensam a falha, ainda mais em cutting e com 6h de sono."],
             ["Isoladores", "RIR 0–1", "Elevação lateral no cabo, extensora, flexora sentada, panturrilha, crucifixo inverso. Última série pode ir à falha: custo baixo, estímulo real."],
             ["Aquecimento", "RIR 4+", "Longe da falha, sempre. 2–3 séries progressivas antes do primeiro exercício de cada padrão."],
           ].map(([t, r, d]) => (
@@ -1877,7 +2062,7 @@ function Method() {
         <SecHd eyebrow="Regra de ouro" title="Não mude o programa" />
         <div className="card">
           <div className="stack">
-            {["Não adicionar exercícios nas 8 semanas.", "Não adicionar séries porque 'estava fácil' — aumente reps ou carga primeiro.", "Registrar carga, reps e RIR.", "Panturrilha e abdômen não são opcionais.", "Domingo não vira sétimo treino.", "Fotos a cada 4 semanas, mesmas condições.", "Peso: acompanhar tendência, nunca um dia isolado.", "Dieta continua com o nutricionista."].map((r, i) => (
+            {["Não adicionar exercícios durante o bloco.", "Não adicionar séries porque 'estava fácil' — aumente reps ou carga primeiro.", "Registrar carga, reps e RIR.", "Panturrilha e abdômen não são opcionais.", "Domingo não vira sétimo treino.", "Fotos a cada 4 semanas, mesmas condições.", "Peso: acompanhar tendência, nunca um dia isolado.", "Dieta continua com o nutricionista."].map((r, i) => (
               <div className="row small" key={i} style={{ alignItems: "flex-start", gap: 10, color: "var(--ink-2)" }}>
                 <span className="num mut3" style={{ fontSize: 11, minWidth: 15, paddingTop: 2 }}>{String(i + 1).padStart(2, "0")}</span><span>{r}</span>
               </div>
@@ -1889,10 +2074,10 @@ function Method() {
       </div>
 
       <div className="sec">
-        <SecHd eyebrow="Enquanto o sono não sobe" title="Cardio" />
+        <SecHd eyebrow="Em cutting" title="Cardio" />
         <div className="card">
-          <p className="small" style={{ margin: 0 }}>Nas primeiras 4 semanas: <b>8.000 passos por dia</b>, sem cardio estruturado.</p>
-          <p className="small mut" style={{ marginTop: 10 }}>Caminhada eleva o gasto diário sem competir por recuperação. Esteira em ritmo forte compete — e você está tentando ganhar massa com 6h de sono. Se a cintura passar de 87 cm ou o peso subir mais de 1 kg/semana por duas semanas seguidas, aí entram 2 sessões de 20–30 min em ritmo de conversa, avisando o nutricionista.</p>
+          <p className="small" style={{ margin: 0 }}><b>Fixo no fim do D (sábado): 20–30 min</b> em ritmo de conversa, mais 8.000 passos por dia.</p>
+          <p className="small mut" style={{ marginTop: 10 }}>Sábado é o dia com mais tempo, então fica mais difícil pular. Ritmo leve não compete com a recuperação das pernas. Esteira em ritmo forte compete. Duração e frequência ajustadas junto com o nutricionista.</p>
           <div className="row" style={{ marginTop: 13, flexWrap: "wrap", gap: 7 }}>
             <Pill k="info">Caminhada inclinada</Pill><Pill k="info">Bicicleta</Pill><Pill k="info">Ritmo de conversa</Pill>
           </div>
@@ -1906,7 +2091,11 @@ function Method() {
 function LogView({ log, openEx }) {
   const items = useMemo(() => {
     const all = [];
-    PROGRAM.forEach((w) => w.ex.forEach((it) => { if (!all.find((a) => a.it.id === it.id)) all.push({ w, it }); }));
+    PROGRAM.forEach((w) => w.ex.forEach((it) => {
+      if (it.unit) return; /* cardio não tem carga */
+      if (!all.find((a) => a.it.id === it.id)) all.push({ w, it });
+      if (it.alt && !all.find((a) => a.it.id === it.alt)) all.push({ w, it: { ...it, id: it.alt, alt: undefined, note: "Substituto" } });
+    }));
     return all.map((a) => ({ ...a, entries: (log[a.it.id] || []) }))
       .sort((a, b) => b.entries.length - a.entries.length || (a.it.prio > b.it.prio ? 1 : -1));
   }, [log]);
@@ -1926,7 +2115,7 @@ function LogView({ log, openEx }) {
       {total === 0 && (
         <div className="empty" style={{ marginTop: 14 }}>
           <div className="disp d-s" style={{ color: "var(--ink-2)" }}>Nada anotado ainda</div>
-          <p className="small" style={{ marginTop: 8 }}>Comece por três: elevação lateral no cabo, lat pulldown e supino inclinado. Só isso já permite um check-in de verdade em 8 semanas.</p>
+          <p className="small" style={{ marginTop: 8 }}>Comece por três: elevação lateral no cabo, lat pulldown e supino inclinado. Só isso já permite um check-in de verdade no fim do bloco.</p>
         </div>
       )}
 
@@ -2036,11 +2225,11 @@ function Recovery({ recovery, saveRecovery, toast }) {
         <div className="card">
           <p className="small mut" style={{ margin: 0 }}>Sempre em jejum, sábado de manhã, mesma balança.</p>
           <div className="stack" style={{ marginTop: 14 }}>
-            {[["Peso", "83,7 kg", "86–87 kg em 8 semanas"], ["Cintura (umbigo)", "83,5 cm", "≤ 86 cm — freio se passar de 87"], ["Ombro (linha do deltoide)", "medir", "+1,5–2 cm"], ["Braço contraído", "medir", "manter ou +0,5 cm"], ["Foto frente e costas", "relaxado", "mesma luz, mesmo horário"]].map(([a, b, c]) => (
+            {[["Peso", "tendência", "caindo no ritmo que o nutricionista definiu"], ["Cintura (umbigo)", "medir", "caindo semana a semana"], ["Ombro (linha do deltoide)", "medir", "manter: sinal de que o músculo ficou"], ["Braço contraído", "medir", "manter"], ["Foto frente, lado e costas", "relaxado", "mesma luz, mesmo horário"]].map(([a, b, c]) => (
               <div key={a}><div className="between"><span style={{ fontSize: 14 }}>{a}</span><span className="num mut" style={{ fontSize: 13 }}>{b}</span></div><div className="tiny mut3" style={{ marginTop: 3 }}>{c}</div><hr className="hair" style={{ marginTop: 11 }} /></div>
             ))}
           </div>
-          <p className="tiny mut3" style={{ marginTop: 12 }}>Deload na semana 9: mesmos exercícios, mesma carga, metade das séries, RIR 3–4. Não é opcional.</p>
+          <p className="tiny mut3" style={{ marginTop: 12 }}>Deload no fim do bloco: mesmos exercícios, mesma carga, metade das séries, RIR 3–4. Não é opcional.</p>
         </div>
       </div>
     </div>
@@ -2094,7 +2283,7 @@ export default function App() {
     toast(st.sessions[id] ? "Desmarcado" : "Sessão concluída");
   };
   const sessionDone = (key) => !!st.sessions[`${weekId()}:${key}`];
-  const counters = { calf: (sessionDone("legsA") ? 1 : 0) + (sessionDone("legsB") ? 1 : 0), abs: (sessionDone("legsA") ? 1 : 0) + (sessionDone("legsB") ? 1 : 0) };
+  const counters = { calf: (sessionDone("legsA") ? 1 : 0) + (sessionDone("armsD") ? 1 : 0), abs: sessionDone("armsD") ? 1 : 0, cardio: sessionDone("armsD") ? 1 : 0 };
 
   const go = (v) => { setView(v); setWk(null); window.scrollTo({ top: 0, behavior: "instant" }); };
   const openWorkout = (k) => { setWk(k); window.scrollTo({ top: 0, behavior: "instant" }); };
