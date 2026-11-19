@@ -86,6 +86,32 @@ const CSS = `
 .blk{display:flex;align-items:center;gap:8px;padding-top:16px}
 .blk::after{content:"";flex:1;height:1px;background:var(--line-soft)}
 
+/* descanso flutuante (acima das abas) */
+.frest{position:fixed;left:16px;right:16px;bottom:calc(88px + env(safe-area-inset-bottom));z-index:65;max-width:520px;margin:0 auto;
+  background:rgba(14,18,14,.94);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border:1px solid var(--line);
+  border-radius:16px;overflow:hidden;box-shadow:0 20px 44px -22px rgba(0,0,0,.95);animation:rise .22s ease both}
+.frest.done{border-color:var(--accent-line)}
+.frest-bar{height:4px;background:var(--surface-2)}
+.frest-bar>i{display:block;height:100%;background:var(--accent);transition:width .25s linear}
+.frest-row{display:flex;align-items:center;gap:8px;padding:8px 8px 8px 16px}
+.frest-txt{flex:1;min-width:0}
+.frest-k{font-family:Archivo,Inter,sans-serif;font-stretch:112%;font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-3)}
+.frest.done .frest-k{color:var(--accent)}
+.frest-l{font-size:12px;line-height:16px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.frest-t{font-size:24px;line-height:32px;padding:0 8px}
+.frest.done .frest-t{color:var(--accent)}
+.vt .frest-b{min-width:40px;height:40px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);
+  font-size:12px;font-weight:700;display:grid;place-items:center;color:var(--ink)}
+
+/* timer rápido + switch */
+.qt{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.vt .btn-o{background:var(--surface-2);border:1px solid var(--line)}
+.vt .qt .btn{padding:8px;min-height:48px;font-size:14px;font-weight:700;background:var(--surface-2);border:1px solid var(--line)}
+.vt .sw{width:48px;height:24px;flex:none;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);position:relative;transition:background .18s}
+.sw>i{position:absolute;top:3px;left:4px;width:16px;height:16px;border-radius:50%;background:var(--ink-3);transition:left .18s,background .18s}
+.vt .sw.on{background:var(--accent-dim);border-color:var(--accent-line)}
+.sw.on>i{left:26px;background:var(--accent)}
+
 /* buttons */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 18px;border-radius:var(--r-m);
   font-size:14px;font-weight:600;min-height:48px;transition:transform .12s ease,background .16s ease,border-color .16s ease;
@@ -1586,42 +1612,169 @@ function Check({ on, label, onToggle }) {
 }
 
 /* ----------------------------- TIMER DESCANSO ---------------------------- */
-function RestTimer({ seconds, onClose }) {
-  const [left, setLeft] = useState(seconds);
-  const [run, setRun] = useState(true);
+/* O timer guarda o HORÁRIO de término, não uma contagem. Se o iPhone congelar a página em
+   segundo plano, ao voltar o tempo já está certo. O alarme com tela bloqueada vem do Relógio
+   do iPhone, disparado por um Atalho ("Descanso"), porque um site não toca som em segundo plano. */
+const SHORTCUT = "Descanso";
+const shortcutUrl = (sec) => `shortcuts://run-shortcut?name=${encodeURIComponent(SHORTCUT)}&input=text&text=${sec}`;
+const openShortcut = (sec) => { try { window.location.href = shortcutUrl(sec); } catch (err) { /* sem Atalhos */ } };
+const fmtClock = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+const restLeft = (rest, now) => Math.ceil((rest.endAt - now) / 1000); /* negativo = tempo extra */
+
+let AUDIO = null;
+const unlockAudio = () => {
+  try {
+    AUDIO = AUDIO || new (window.AudioContext || window.webkitAudioContext)();
+    if (AUDIO.state === "suspended") AUDIO.resume();
+  } catch (err) { /* sem áudio */ }
+};
+const beep = () => {
+  try {
+    if (!AUDIO) return;
+    const t = AUDIO.currentTime;
+    [0, 0.28, 0.56].forEach((d) => {
+      const o = AUDIO.createOscillator(), g = AUDIO.createGain();
+      o.type = "sine"; o.frequency.value = 880;
+      g.gain.setValueAtTime(0.0001, t + d);
+      g.gain.exponentialRampToValueAtTime(0.35, t + d + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + d + 0.2);
+      o.connect(g); g.connect(AUDIO.destination);
+      o.start(t + d); o.stop(t + d + 0.22);
+    });
+  } catch (err) { /* sem áudio */ }
+};
+
+/* Relógio que só roda enquanto há descanso ativo e atualiza na hora em que o app volta à tela */
+function useClock(active, ms = 250) {
+  const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
-    if (!run) return;
-    const t = setInterval(() => setLeft((v) => (v <= 1 ? 0 : v - 1)), 1000);
-    return () => clearInterval(t);
-  }, [run]);
-  useEffect(() => { if (left === 0) setRun(false); }, [left]);
-  const pct = seconds ? ((seconds - left) / seconds) * 100 : 0;
-  const mm = String(Math.floor(left / 60)).padStart(1, "0"), ss = String(left % 60).padStart(2, "0");
+    if (!active) return;
+    const tick = () => setNow(Date.now());
+    tick();
+    const iv = setInterval(tick, ms);
+    document.addEventListener("visibilitychange", tick);
+    window.addEventListener("focus", tick);
+    return () => { clearInterval(iv); document.removeEventListener("visibilitychange", tick); window.removeEventListener("focus", tick); };
+  }, [active, ms]);
+  return now;
+}
+
+/* Marca o fim do descanso. Só apita se o app estava na tela quando o tempo acabou. */
+function RestWatcher({ rest, onDone }) {
+  const now = useClock(!!rest && !rest.done, 500);
+  useEffect(() => {
+    if (rest && !rest.done && now >= rest.endAt) onDone(document.visibilityState === "visible" && now - rest.endAt < 3000);
+  }, [now, rest, onDone]);
+  return null;
+}
+
+/* Painel grande, dentro do guia do exercício */
+function RestPanel({ rest, onAdd, onStop, onRestart }) {
+  const now = useClock(true);
+  const left = restLeft(rest, now), done = left <= 0;
+  const pct = Math.min(100, ((rest.total - Math.max(left, 0)) / rest.total) * 100);
   return (
-    <div className="card rise" style={{ marginTop: 12, borderColor: left === 0 ? "var(--accent-line)" : "var(--line)" }}>
+    <div className="card rise" style={{ marginTop: 16, borderColor: done ? "var(--accent-line)" : "var(--line)" }}>
       <div className="between">
-        <div className="eyebrow">{left === 0 ? "Descanso concluído" : "Descansando"}</div>
-        <button className="btn sm ghost" onClick={onClose} aria-label="Fechar timer">{I.x()}</button>
+        <div className="eyebrow" style={{ color: done ? "var(--accent)" : undefined }}>{done ? "Descanso concluído" : "Descansando"}</div>
+        <span className="tiny mut3" style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{rest.label}</span>
       </div>
-      <div className="num" style={{ fontSize: 46, marginTop: 6, color: left === 0 ? "var(--accent)" : "var(--ink)" }}>{mm}:{ss}</div>
-      <div className="bar" style={{ marginTop: 12 }}><i style={{ width: `${pct}%` }} /></div>
-      <div className="row" style={{ marginTop: 12 }}>
-        <button className="btn sm" onClick={() => setRun((r) => !r)} style={{ flex: 1 }}>{run ? "Pausar" : "Continuar"}</button>
-        <button className="btn sm" onClick={() => { setLeft(seconds); setRun(true); }} style={{ flex: 1 }}>Reiniciar</button>
+      <div className="num" style={{ fontSize: 48, lineHeight: "56px", marginTop: 8, color: done ? "var(--accent)" : "var(--ink)" }}>
+        {done ? `+${fmtClock(-left)}` : fmtClock(left)}
+      </div>
+      {done && <div className="tiny mut3">tempo extra desde o fim do descanso</div>}
+      <div className="bar" style={{ marginTop: 16 }}><i style={{ width: `${pct}%` }} /></div>
+      <div className="row" style={{ marginTop: 16, gap: 8 }}>
+        {done
+          ? <button className="btn sm primary" style={{ flex: 1 }} onClick={onRestart}>Iniciar de novo · {fmtClock(rest.base)}</button>
+          : <button className="btn sm btn-o" style={{ flex: 1 }} onClick={() => onAdd(15)}>+15s</button>}
+        <button className="btn sm btn-o" style={{ flex: 1 }} onClick={onStop}>{done ? "Fechar" : "Parar"}</button>
+      </div>
+    </div>
+  );
+}
+
+/* Barra flutuante acima das abas: o descanso continua visível em qualquer tela */
+function FloatingRest({ rest, onAdd, onStop, onRestart }) {
+  const now = useClock(true);
+  const left = restLeft(rest, now), done = left <= 0;
+  if (left < -600) return null; /* some sozinha 10 min depois do fim */
+  const pct = Math.min(100, ((rest.total - Math.max(left, 0)) / rest.total) * 100);
+  return (
+    <div className={`frest ${done ? "done" : ""}`} role="timer">
+      <div className="frest-bar"><i style={{ width: `${pct}%` }} /></div>
+      <div className="frest-row">
+        <div className="frest-txt">
+          <div className="frest-k">{done ? "Descanso concluído" : "Descanso"}</div>
+          <div className="frest-l">{rest.label}</div>
+        </div>
+        <b className="num frest-t">{done ? `+${fmtClock(-left)}` : fmtClock(left)}</b>
+        {done
+          ? <button className="frest-b" onClick={onRestart} aria-label="Iniciar descanso de novo">↻</button>
+          : <button className="frest-b" onClick={() => onAdd(15)} aria-label="Mais 15 segundos">+15</button>}
+        <button className="frest-b" onClick={onStop} aria-label="Fechar descanso">{I.x()}</button>
+      </div>
+    </div>
+  );
+}
+
+function Switch({ on, onToggle, label }) {
+  return (
+    <button role="switch" aria-checked={on} aria-label={label} onClick={onToggle} className={`sw ${on ? "on" : ""}`}><i /></button>
+  );
+}
+
+/* Timer fora de um exercício + configuração do alarme do iPhone */
+function QuickTimer({ startRest, iosAlarm, setIosAlarm }) {
+  const [help, setHelp] = useState(false);
+  return (
+    <div className="sec">
+      <SecHd eyebrow="Fora de um exercício" title="Timer rápido" />
+      <div className="card">
+        <div className="qt">
+          {[60, 90, 120, 180].map((sec) => (
+            <button key={sec} className="btn" onClick={() => startRest(sec, "Timer rápido")}>{sec < 120 ? `${sec}s` : `${sec / 60} min`}</button>
+          ))}
+        </div>
+        <hr className="hair" style={{ margin: "16px 0" }} />
+        <div className="between" style={{ alignItems: "flex-start" }}>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontWeight: 600, fontSize: 14 }}>Alarme do iPhone</div>
+            <div className="tiny mut3" style={{ marginTop: 4 }}>Toca no fim do descanso mesmo com a tela bloqueada ou em outro app.</div>
+          </div>
+          <Switch on={iosAlarm} onToggle={() => setIosAlarm(!iosAlarm)} label="Alarme do iPhone" />
+        </div>
+        <button className="btn sm ghost" style={{ paddingLeft: 0, marginTop: 8 }} onClick={() => setHelp((h) => !h)} aria-expanded={help}>
+          {help ? "Esconder configuração" : "Como configurar (uma vez só)"}
+        </button>
+        {help && (
+          <div className="rise" style={{ marginTop: 8 }}>
+            <ol className="small mut" style={{ margin: 0, paddingLeft: 16 }}>
+              <li>Abra o app <b style={{ color: "var(--ink)" }}>Atalhos</b> e toque em <b style={{ color: "var(--ink)" }}>+</b>.</li>
+              <li>Adicione a ação <b style={{ color: "var(--ink)" }}>Iniciar Timer</b>.</li>
+              <li>Toque no número da duração, escolha a variável <b style={{ color: "var(--ink)" }}>Entrada do Atalho</b> e deixe em <b style={{ color: "var(--ink)" }}>segundos</b>.</li>
+              <li>Renomeie o atalho para <b style={{ color: "var(--ink)" }}>{SHORTCUT}</b>, exatamente assim, e salve.</li>
+              <li>Volte aqui, ligue o Alarme do iPhone e faça o teste.</li>
+            </ol>
+            <button className="btn sm btn-o" style={{ marginTop: 16 }} onClick={() => { startRest(10, "Teste do alarme", { skipShortcut: true }); openShortcut(10); }}>Testar com 10s</button>
+            <p className="tiny mut3" style={{ margin: "16px 0 0" }}>
+              Ao iniciar um descanso, o iPhone abre o Atalhos por um instante; volte pelo ◀ no canto superior esquerdo. O +15s e o Parar daqui não mexem no timer do Relógio.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
 /* --------------------------- MODAL DO EXERCÍCIO -------------------------- */
-function ExerciseSheet({ item, workout, onClose, toast, log, addLog, checks, toggleCheck }) {
+function ExerciseSheet({ item, workout, onClose, toast, log, addLog, checks, toggleCheck, rest, startRest, addRest, stopRest, restartRest, iosAlarm }) {
   /* cur = exercício exibido (principal ou substituto). Registro e checklist seguem o que foi feito de verdade. */
   const [cur, setCur] = useState(item.id);
   const x = EX[cur];
   const curItem = cur === item.id ? item : { ...item, id: cur, alt: undefined };
   const exIdx = workout.ex.findIndex((it) => it.id === item.id || it.alt === item.id) + 1;
   const [tab, setTab] = useState("guia");
-  const [timer, setTimer] = useState(false);
   const [w, setW] = useState(""); const [r, setR] = useState(""); const [rr, setRR] = useState(""); const [n, setN] = useState("");
   const ref = useRef(null);
   useEffect(() => { ref.current?.focus(); const h = (ev) => ev.key === "Escape" && onClose(); window.addEventListener("keydown", h); return () => window.removeEventListener("keydown", h); }, [onClose]);
@@ -1703,8 +1856,15 @@ function ExerciseSheet({ item, workout, onClose, toast, log, addLog, checks, tog
                 <b style={{ color: "var(--info)" }}>Série pesada + leves.</b> A 1ª série é pesada ({item.reps.split(" / ")[0]} reps, RIR 1) e é a que você registra. Depois, {item.sets - 1} séries com ~10% menos carga ({item.reps.split(" / ")[1]} reps, RIR 2). No cutting, manter a carga da pesada já é sucesso.
               </p>
             )}
-            {item.restSec > 0 && <button className="btn primary" style={{ marginTop: 15 }} onClick={() => setTimer((t) => !t)}>{I.timer()} {timer ? "Fechar timer" : "Iniciar descanso"}</button>}
-            {timer && <RestTimer seconds={item.restSec} onClose={() => setTimer(false)} />}
+            {item.restSec > 0 && !rest && (
+              <button className="btn primary" style={{ marginTop: 16 }} onClick={() => startRest(item.restSec, x.short || x.name)}>
+                {I.timer()} Iniciar descanso · {fmtClock(item.restSec)}
+              </button>
+            )}
+            {rest && <RestPanel rest={rest} onAdd={addRest} onStop={stopRest} onRestart={restartRest} />}
+            {item.restSec > 0 && !iosAlarm && (
+              <p className="tiny mut3" style={{ margin: "8px 0 0" }}>Para tocar com a tela bloqueada, ligue o Alarme do iPhone na tela Hoje.</p>
+            )}
           </div>
 
           {tab === "guia" && (
@@ -1928,7 +2088,7 @@ function WorkoutView({ w, onBack, onOpen, toast, checks, toggleCheck, sessionDon
 }
 
 /* ------------------------------ VIEW: HOJE ------------------------------- */
-function Today({ go, openWorkout, checks, counters }) {
+function Today({ go, openWorkout, checks, counters, startRest, iosAlarm, setIosAlarm }) {
   const k = todayKey();
   const w = PROGRAM.find((p) => p.key === k);
   const first = w && EX[w.ex[0].id];
@@ -1978,6 +2138,8 @@ function Today({ go, openWorkout, checks, counters }) {
           <button className="btn" style={{ marginTop: 14 }} onClick={() => go("recovery")}>Abrir Recovery</button>
         </div>
       )}
+
+      <QuickTimer startRest={startRest} iosAlarm={iosAlarm} setIosAlarm={setIosAlarm} />
 
       {/* SIGNATURE: a cunha */}
       <div className="sec">
@@ -2413,7 +2575,7 @@ export default function App() {
   const [wk, setWk] = useState(null);
   const [sheet, setSheet] = useState(null);
   const [msg, setMsg] = useState(null);
-  const [st, setSt] = useState({ checks: { pre: {}, ex: {} }, log: {}, recovery: [], sessions: {} });
+  const [st, setSt] = useState({ checks: { pre: {}, ex: {} }, log: {}, recovery: [], sessions: {}, rest: null, settings: {} });
   const scroller = useRef(null);
 
   const toast = useCallback((t) => { setMsg(t); setTimeout(() => setMsg(null), 1900); }, []);
@@ -2425,7 +2587,7 @@ export default function App() {
         const r = await window.storage.get("vtaper-state");
         if (live && r?.value) {
           const p = JSON.parse(r.value);
-          setSt({ checks: { pre: {}, ex: {}, ...(p.checks || {}) }, log: p.log || {}, recovery: p.recovery || [], sessions: p.sessions || {} });
+          setSt({ checks: { pre: {}, ex: {}, ...(p.checks || {}) }, log: p.log || {}, recovery: p.recovery || [], sessions: p.sessions || {}, rest: p.rest || null, settings: p.settings || {} });
         }
       } catch (err) { /* primeira execução: sem estado salvo */ }
       if (live) setTimeout(() => setReady(true), 260);
@@ -2453,6 +2615,26 @@ export default function App() {
     toast(st.sessions[id] ? "Desmarcado" : "Sessão concluída");
   };
   const sessionDone = (key) => !!st.sessions[`${weekId()}:${key}`];
+
+  /* descanso global: sobrevive a trocar de tela, sair do navegador e recarregar */
+  const iosAlarm = !!st.settings.iosAlarm;
+  const setIosAlarm = (v) => persist({ ...st, settings: { ...st.settings, iosAlarm: v } });
+  const startRest = (sec, label, opts = {}) => {
+    unlockAudio();
+    persist({ ...st, rest: { endAt: Date.now() + sec * 1000, total: sec, base: sec, label, done: false } });
+    if (iosAlarm && !opts.skipShortcut) openShortcut(sec);
+  };
+  const addRest = (sec) => {
+    const r = st.rest; if (!r) return;
+    persist({ ...st, rest: { ...r, endAt: r.endAt + sec * 1000, total: r.total + sec } });
+  };
+  const stopRest = () => persist({ ...st, rest: null });
+  const restartRest = () => st.rest && startRest(st.rest.base, st.rest.label);
+  const restDone = useCallback((alert) => {
+    if (alert) { beep(); try { navigator.vibrate?.([220, 120, 220]); } catch (err) { /* sem vibração */ } }
+    persist({ ...st, rest: st.rest ? { ...st.rest, done: true } : null });
+  }, [st, persist]);
+  const restVisible = !!st.rest && Date.now() - st.rest.endAt < 600000;
   const counters = { calf: (sessionDone("legsA") ? 1 : 0) + (sessionDone("armsD") ? 1 : 0), abs: sessionDone("armsD") ? 1 : 0, cardio: sessionDone("armsD") ? 1 : 0 };
 
   const go = (v) => { setView(v); setWk(null); window.scrollTo({ top: 0, behavior: "instant" }); };
@@ -2462,7 +2644,7 @@ export default function App() {
   const TABS = [["today", "Hoje", I.today], ["week", "Semana", I.week], ["method", "Método", I.method], ["log", "Registro", I.log], ["recovery", "Recovery", I.rec]];
 
   return (
-    <div className="vt" ref={scroller}>
+    <div className="vt" ref={scroller} style={restVisible ? { paddingBottom: 176 } : undefined}>
       <style>{CSS}</style>
 
       {!ready ? (
@@ -2477,7 +2659,8 @@ export default function App() {
         <WorkoutView w={workout} onBack={() => setWk(null)} onOpen={(it) => setSheet({ w: workout, it })}
           toast={toast} checks={st.checks} toggleCheck={toggleCheck} sessionDone={sessionDone} markSession={markSession} />
       ) : view === "today" ? (
-        <Today go={go} openWorkout={openWorkout} checks={st.checks} counters={counters} />
+        <Today go={go} openWorkout={openWorkout} checks={st.checks} counters={counters}
+          startRest={startRest} iosAlarm={iosAlarm} setIosAlarm={setIosAlarm} />
       ) : view === "week" ? (
         <Week openWorkout={openWorkout} sessionDone={sessionDone} />
       ) : view === "method" ? (
@@ -2490,10 +2673,14 @@ export default function App() {
 
       {sheet && (
         <ExerciseSheet item={sheet.it} workout={sheet.w} onClose={() => setSheet(null)} toast={toast}
-          log={st.log} addLog={addLog} checks={st.checks} toggleCheck={toggleCheck} />
+          log={st.log} addLog={addLog} checks={st.checks} toggleCheck={toggleCheck}
+          rest={st.rest} startRest={startRest} addRest={addRest} stopRest={stopRest} restartRest={restartRest} iosAlarm={iosAlarm} />
       )}
 
-      {msg && <div className="toast">{msg}</div>}
+      <RestWatcher rest={st.rest} onDone={restDone} />
+      {st.rest && !sheet && <FloatingRest rest={st.rest} onAdd={addRest} onStop={stopRest} onRestart={restartRest} />}
+
+      {msg && <div className="toast" style={restVisible && !sheet ? { bottom: 172 } : undefined}>{msg}</div>}
 
       <nav className="tabbar" aria-label="Navegação principal">
         <div className="tabs">
