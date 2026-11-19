@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
 
 /* ============================================================================
-   CENTRAL DE PERFORMANCE V-TAPER — Bloco 1
+   CENTRAL DE PERFORMANCE V-TAPER · Bloco 2 (cutting)
    Programa híbrido. Camada de consulta/execução. Registro oficial: Hevy/Stronger.
    ========================================================================== */
 
@@ -68,6 +68,23 @@ const CSS = `
 .pill.ok{background:var(--accent-dim);color:var(--accent);border-color:var(--accent-line)}
 .pill.info{background:var(--info-dim);color:var(--info);border-color:rgba(106,168,255,.28)}
 .dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex:none}
+
+/* área focal (músculo-alvo): raio 8 e caixa normal para não se confundir com as pills de status */
+.focal{display:inline-flex;align-items:center;gap:8px;max-width:100%;height:24px;padding:0 8px;border-radius:8px;
+  background:var(--accent-dim);border:1px solid var(--accent-line);color:var(--accent);
+  font-size:12px;line-height:16px;font-weight:700;letter-spacing:.01em}
+.focal>svg{flex:none}
+.focal>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.focal.lg{height:32px;font-size:14px;line-height:20px}
+.focal.txt{height:auto;padding:0;background:none;border:0;gap:8px}
+.focus{margin-top:8px;padding-left:16px;border-left:2px solid var(--accent-line);
+  display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+.focus-cue{margin:0;font-size:14px;line-height:20px;font-weight:500;color:var(--ink)}
+.focus-cue b{font-family:Archivo,Inter,sans-serif;font-stretch:112%;font-size:10px;font-weight:700;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--ink-3);margin-right:8px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.blk{display:flex;align-items:center;gap:8px;padding-top:16px}
+.blk::after{content:"";flex:1;height:1px;background:var(--line-soft)}
 
 /* buttons */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 18px;border-radius:var(--r-m);
@@ -514,6 +531,20 @@ const T = {
     arc: [[46, 104], [60, 98], [72, 101]],
     lbl: ["Esteira inclinada, passo firme", "Ritmo de conversa, sem segurar"],
   },
+  pulldown_kneel: {
+    a: S([62, 36, 60, 48, 64, 32, 68, 16, 58, 76, 60, 100, 40, 102]),
+    b: S([62, 36, 60, 48, 56, 66, 62, 52, 58, 76, 60, 100, 40, 102]),
+    eq: [["cable", 68, 0, 68, 16], ["floor", 104]],
+    arc: [[68, 18], [62, 38], [62, 52]],
+    lbl: ["Braço esticado, ombro sobe", "Cotovelo desce até o quadril"],
+  },
+  front_raise: {
+    a: S([62, 24, 58, 38, 60, 52, 62, 66, 56, 64, 54, 88, 52, 112]),
+    b: S([62, 24, 58, 38, 72, 36, 86, 34, 56, 64, 54, 88, 52, 112]),
+    eq: [["cable", 40, 110, 62, 66], ["rope", 62, 66], ["floor", 113]],
+    arc: [[64, 66], [80, 58], [86, 36]],
+    lbl: ["Corda entre as pernas, braço longo", "Sobe até a linha dos olhos"],
+  },
 };
 
 /* mapa exercício → template (figuras esquemáticas; variações compartilham o padrão) */
@@ -536,7 +567,7 @@ const FIGMAP = {
   rdl: "hinge", hip_thrust: "hip_thrust",
   crossover_baixo: "cable_fly_up", abdutora: "abductor", supino_fechado: "close_bench",
   bulgaro: "split_squat", leg_press_uni: "leg_press_deep", cardio: "walk_incline",
-  rosca_direta: "curl_front",
+  rosca_direta: "curl_front", puxada_uni_cabo: "pulldown_kneel", elev_frontal_cabo: "front_raise",
 };
 
 function Figure({ pose, color, dim }) {
@@ -633,6 +664,7 @@ function ExFigure({ exId, height = 176, compact = false }) {
 const EX = {
   elev_cabo_uni: {
     name: "Elevação lateral no cabo (unilateral)",
+    focal: "Deltoide lateral",
     equip: "Cabo / polia baixa",
     primary: ["deltLat"], secondary: ["upBack", "traps"],
     target: "Deltoide lateral", sec: "Trapézio superior, supraespinal",
@@ -648,6 +680,7 @@ const EX = {
   },
   supino_incl_halt: {
     name: "Supino inclinado com halteres",
+    focal: "Peitoral superior",
     equip: "Banco 30–35° + halteres",
     primary: ["chestUp"], secondary: ["deltFront", "triceps"],
     target: "Peitoral (porção clavicular)", sec: "Deltoide anterior, tríceps",
@@ -663,6 +696,7 @@ const EX = {
   },
   chest_press: {
     name: "Chest Press na máquina",
+    focal: "Peitoral médio",
     equip: "Máquina de supino sentado",
     primary: ["chestMid", "chestUp"], secondary: ["triceps", "deltFront"],
     target: "Peitoral", sec: "Tríceps, deltoide anterior",
@@ -678,6 +712,7 @@ const EX = {
   },
   elev_halt: {
     name: "Elevação lateral com halteres",
+    focal: "Deltoide lateral",
     equip: "Halteres",
     primary: ["deltLat"], secondary: ["traps", "deltFront"],
     target: "Deltoide lateral", sec: "Trapézio superior",
@@ -693,6 +728,7 @@ const EX = {
   },
   crucifixo_maq: {
     name: "Crucifixo na máquina / Pec Deck",
+    focal: "Peitoral médio",
     equip: "Pec Deck",
     primary: ["chestMid"], secondary: ["deltFront"],
     target: "Peitoral (adução horizontal)", sec: "Deltoide anterior",
@@ -708,6 +744,7 @@ const EX = {
   },
   tri_overhead: {
     name: "Tríceps overhead no cabo",
+    focal: "Tríceps · cabeça longa",
     equip: "Cabo + corda",
     primary: ["triceps"], secondary: [],
     target: "Tríceps (cabeça longa)", sec: "—",
@@ -723,6 +760,7 @@ const EX = {
   },
   pullup: {
     name: "Barra fixa (pull-up)",
+    focal: "Dorsal (latíssimo)",
     equip: "Barra fixa (assistida se necessário)",
     primary: ["lats"], secondary: ["upBack", "biceps", "forearm"],
     target: "Grande dorsal", sec: "Redondo maior, romboides, bíceps",
@@ -738,6 +776,7 @@ const EX = {
   },
   pulldown_neutro: {
     name: "Lat Pulldown pegada neutra/média",
+    focal: "Dorsal · porção inferior",
     equip: "Puxador alto + triângulo ou barra neutra",
     primary: ["lats"], secondary: ["upBack", "biceps"],
     target: "Grande dorsal (porção inferior)", sec: "Redondo maior, bíceps",
@@ -753,6 +792,7 @@ const EX = {
   },
   remada_uni_cabo: {
     name: "Remada unilateral no cabo (trajetória para o quadril)",
+    focal: "Dorsal · porção inferior",
     equip: "Polia baixa/média, pegada simples",
     primary: ["lats"], secondary: ["upBack", "biceps", "lowBack"],
     target: "Grande dorsal", sec: "Redondo maior, romboides",
@@ -768,6 +808,7 @@ const EX = {
   },
   pulldown_reto: {
     name: "Pulldown com braço reto (straight-arm)",
+    focal: "Dorsal (latíssimo)",
     equip: "Polia alta + barra reta ou corda",
     primary: ["lats"], secondary: ["abs"],
     target: "Grande dorsal (isolado)", sec: "Core, tríceps cabeça longa",
@@ -783,6 +824,7 @@ const EX = {
   },
   reverse_pec: {
     name: "Reverse Pec Deck (crucifixo inverso)",
+    focal: "Deltoide posterior",
     equip: "Pec Deck invertido ou máquina de rear delt",
     primary: ["deltRear"], secondary: ["upBack", "traps"],
     target: "Deltoide posterior", sec: "Romboides, trapézio médio",
@@ -798,6 +840,7 @@ const EX = {
   },
   rosca_inclinada: {
     name: "Rosca inclinada com halteres",
+    focal: "Bíceps · cabeça longa",
     equip: "Banco 45–60° + halteres",
     primary: ["biceps"], secondary: ["forearm"],
     target: "Bíceps (cabeça longa)", sec: "Braquial, antebraço",
@@ -813,6 +856,7 @@ const EX = {
   },
   hammer: {
     name: "Hammer Curl (rosca martelo)",
+    focal: "Braquial",
     equip: "Halteres",
     primary: ["forearm", "biceps"], secondary: [],
     target: "Braquial e braquiorradial", sec: "Bíceps",
@@ -828,6 +872,7 @@ const EX = {
   },
   agacho: {
     name: "Agachamento livre ou Hack Squat",
+    focal: "Quadríceps",
     equip: "Barra + rack, ou Hack",
     primary: ["quads"], secondary: ["glutes", "add", "lowBack"],
     target: "Quadríceps", sec: "Glúteo, adutores, eretores",
@@ -843,6 +888,7 @@ const EX = {
   },
   leg_press: {
     name: "Leg Press 45°",
+    focal: "Quadríceps",
     equip: "Leg press",
     primary: ["quads"], secondary: ["glutes", "add"],
     target: "Quadríceps", sec: "Glúteo, adutores",
@@ -858,6 +904,7 @@ const EX = {
   },
   extensora: {
     name: "Cadeira extensora",
+    focal: "Quadríceps · reto femoral",
     equip: "Extensora",
     primary: ["quads"], secondary: [],
     target: "Quadríceps (incl. reto femoral)", sec: "—",
@@ -873,6 +920,7 @@ const EX = {
   },
   flexora_sentada: {
     name: "Flexora sentada",
+    focal: "Posterior de coxa",
     equip: "Cadeira flexora",
     primary: ["hams"], secondary: ["calves"],
     target: "Isquiotibiais", sec: "Panturrilha (gastrocnêmio)",
@@ -888,6 +936,7 @@ const EX = {
   },
   adutora: {
     name: "Cadeira adutora",
+    focal: "Adutores",
     equip: "Adutora",
     primary: ["add"], secondary: ["glutes"],
     target: "Adutores (magno, longo)", sec: "Glúteo",
@@ -903,6 +952,7 @@ const EX = {
   },
   pant_pe: {
     name: "Panturrilha em pé",
+    focal: "Panturrilha · gastrocnêmio",
     equip: "Máquina em pé, smith ou leg press",
     primary: ["calves"], secondary: [],
     target: "Gastrocnêmio", sec: "Sóleo",
@@ -918,6 +968,7 @@ const EX = {
   },
   cable_crunch: {
     name: "Cable Crunch (abdominal na polia)",
+    focal: "Reto abdominal",
     equip: "Polia alta + corda",
     primary: ["abs"], secondary: ["obl"],
     target: "Reto abdominal", sec: "Oblíquos",
@@ -933,6 +984,7 @@ const EX = {
   },
   shoulder_press_maq: {
     name: "Shoulder Press na máquina",
+    focal: "Deltoide anterior",
     equip: "Máquina de desenvolvimento",
     primary: ["deltFront"], secondary: ["deltLat", "triceps"],
     target: "Deltoide anterior", sec: "Deltoide lateral, tríceps",
@@ -948,6 +1000,7 @@ const EX = {
   },
   elev_maq: {
     name: "Elevação lateral na máquina",
+    focal: "Deltoide lateral",
     equip: "Máquina de elevação lateral (ou halteres, se não houver)",
     primary: ["deltLat"], secondary: ["traps"],
     target: "Deltoide lateral", sec: "Trapézio superior",
@@ -963,6 +1016,7 @@ const EX = {
   },
   supino_incl_smith: {
     name: "Supino inclinado na máquina/Smith",
+    focal: "Peitoral superior",
     equip: "Smith ou máquina inclinada",
     primary: ["chestUp"], secondary: ["deltFront", "triceps"],
     target: "Peitoral (porção clavicular)", sec: "Deltoide anterior, tríceps",
@@ -978,6 +1032,7 @@ const EX = {
   },
   tri_pushdown: {
     name: "Tríceps Pushdown",
+    focal: "Tríceps · lateral e medial",
     equip: "Polia alta + barra ou corda",
     primary: ["triceps"], secondary: [],
     target: "Tríceps (cabeças lateral e medial)", sec: "—",
@@ -993,21 +1048,23 @@ const EX = {
   },
   pulldown_aberto: {
     name: "Lat Pulldown pegada pronada aberta",
+    focal: "Dorsal (latíssimo)",
     equip: "Puxador alto + barra longa",
     primary: ["lats"], secondary: ["upBack", "biceps"],
     target: "Grande dorsal (adução)", sec: "Redondo maior, romboides",
-    goal: "Pegada aberta afasta o cotovelo do tronco e aumenta o componente de adução — a função do dorsal mais ligada à largura. Complementa a pegada neutra do B.",
+    goal: "Puxada vertical com o braço vindo pela lateral, complementando a pegada neutra do B. Pegada aberta não deixa o dorsal mais largo por si só: estudos de ativação não mostram vantagem clara, e pegada larga demais só encurta a amplitude. Use em torno de 1,5x a largura dos ombros e priorize o alongamento completo em cima.",
     setup: ["Pegada pronada, cerca de 1,5× a largura dos ombros.", "Coxins firmes nas coxas.", "Tronco quase vertical."],
     exec: ["Puxe até a clavícula, cotovelo descendo em arco.", "Volte permitindo alongamento completo e elevação escapular."],
     breath: "Expira puxando.",
     rom: "Do alongamento total até a clavícula. Não puxe até o abdômen.",
     tempo: "1s puxa · 2–3s solta",
     errors: ["Jogar o tronco a 45° e virar remada.", "Puxar atrás da nuca.", "Pegada larga demais reduzindo amplitude.", "Não alongar em cima."],
-    cue: "Cotovelo desce em arco largo.",
+    cue: "Solta o ombro em cima, cotovelo desce em arco.",
     progress: "Faixa 8–12. 12/12/12 com RIR 1 → próxima placa.",
   },
   chest_supported_row: {
     name: "Remada apoiada no peito (Chest Supported Row)",
+    focal: "Trapézio médio e romboides",
     equip: "Máquina apoiada ou banco inclinado + halteres",
     primary: ["upBack"], secondary: ["lats", "deltRear", "biceps"],
     target: "Trapézio médio e romboides", sec: "Dorsal, deltoide posterior",
@@ -1023,6 +1080,7 @@ const EX = {
   },
   seated_row: {
     name: "Seated Cable Row",
+    focal: "Meio das costas",
     equip: "Remada baixa + triângulo/pegada neutra",
     primary: ["upBack", "lats"], secondary: ["biceps", "lowBack"],
     target: "Costas média", sec: "Dorsal, bíceps",
@@ -1038,6 +1096,7 @@ const EX = {
   },
   pullover: {
     name: "Pullover na máquina ou no cabo",
+    focal: "Dorsal (latíssimo)",
     equip: "Máquina de pullover ou polia alta",
     primary: ["lats"], secondary: ["abs", "triceps"],
     target: "Grande dorsal", sec: "Core, tríceps cabeça longa",
@@ -1053,6 +1112,7 @@ const EX = {
   },
   rosca_scott: {
     name: "Rosca Scott na máquina",
+    focal: "Bíceps · cabeça curta",
     equip: "Máquina Scott / banco Scott",
     primary: ["biceps"], secondary: ["forearm"],
     target: "Bíceps (cabeça curta)", sec: "Braquial",
@@ -1068,6 +1128,7 @@ const EX = {
   },
   pinwheel: {
     name: "Pinwheel / Hammer Curl",
+    focal: "Braquial",
     equip: "Halteres",
     primary: ["forearm", "biceps"], secondary: [],
     target: "Braquial e braquiorradial", sec: "Bíceps",
@@ -1083,6 +1144,7 @@ const EX = {
   },
   rdl: {
     name: "Romanian Deadlift (RDL)",
+    focal: "Posterior de coxa",
     equip: "Barra ou halteres",
     primary: ["hams"], secondary: ["glutes", "lowBack"],
     target: "Isquiotibiais", sec: "Glúteo, eretores da espinha",
@@ -1098,6 +1160,7 @@ const EX = {
   },
   flexora: {
     name: "Flexora sentada ou deitada",
+    focal: "Posterior de coxa",
     equip: "Cadeira ou mesa flexora",
     primary: ["hams"], secondary: ["calves"],
     target: "Isquiotibiais", sec: "Panturrilha",
@@ -1113,6 +1176,7 @@ const EX = {
   },
   hip_thrust: {
     name: "Hip Thrust (elevação pélvica)",
+    focal: "Glúteo máximo",
     equip: "Banco + barra, ou máquina de hip thrust",
     primary: ["glutes"], secondary: ["hams"],
     target: "Glúteo máximo", sec: "Isquiotibiais",
@@ -1128,6 +1192,7 @@ const EX = {
   },
   pant_sentada: {
     name: "Panturrilha sentada",
+    focal: "Panturrilha · sóleo",
     equip: "Máquina de panturrilha sentada",
     primary: ["calves"], secondary: [],
     target: "Sóleo", sec: "Gastrocnêmio",
@@ -1143,10 +1208,11 @@ const EX = {
   },
   hanging_leg: {
     name: "Hanging Leg Raise (elevação de pernas suspenso)",
+    focal: "Abdômen inferior",
     equip: "Barra fixa ou paralelas",
     primary: ["abs"], secondary: ["obl"],
     target: "Reto abdominal (porção inferior)", sec: "Oblíquos, flexores do quadril",
-    goal: "Opcional, no fim do B, nos dias em que sobrar tempo. Complementa o abdominal na polia do D: lá a coluna enrola, aqui é a pelve que sobe. Joelho flexionado no começo, tudo bem.",
+    goal: "Opcional, no fim do A, nos dias em que sobrar tempo. Complementa o abdominal na polia do D: lá a coluna enrola, aqui é a pelve que sobe. Joelho flexionado no começo, tudo bem.",
     setup: ["Pendurado na barra, ombros ativos (não 'largado').", "Pernas juntas, corpo estável.", "Se for difícil, use paralelas com apoio de antebraço."],
     exec: ["Suba as pernas ENROLANDO a pelve para cima, não apenas flexionando o quadril.", "Suba até a pelve rodar; joelhos flexionados se necessário.", "Desça em 2–3s sem balançar."],
     breath: "Expira subindo.",
@@ -1160,6 +1226,7 @@ const EX = {
   /* ------------------------------ BLOCO 2 ------------------------------ */
   crossover_baixo: {
     name: "Crucifixo no cabo de baixo pra cima",
+    focal: "Peitoral superior",
     equip: "Crossover / duas polias baixas",
     primary: ["chestUp"], secondary: ["deltFront"],
     target: "Peitoral (porção clavicular)", sec: "Deltoide anterior",
@@ -1175,6 +1242,7 @@ const EX = {
   },
   supino_fechado: {
     name: "Supino fechado",
+    focal: "Tríceps",
     short: "Supino fechado",
     equip: "Barra, Smith ou paralelas",
     primary: ["triceps"], secondary: ["chestMid", "deltFront"],
@@ -1191,6 +1259,7 @@ const EX = {
   },
   rosca_direta: {
     name: "Rosca direta com barra",
+    focal: "Bíceps",
     equip: "Barra reta ou W",
     primary: ["biceps"], secondary: ["forearm"],
     target: "Bíceps", sec: "Braquial, antebraço",
@@ -1206,6 +1275,7 @@ const EX = {
   },
   bulgaro: {
     name: "Agachamento búlgaro (foco em glúteo)",
+    focal: "Glúteo máximo",
     short: "Búlgaro",
     equip: "Banco + halteres",
     primary: ["glutes"], secondary: ["quads", "add"],
@@ -1222,6 +1292,7 @@ const EX = {
   },
   leg_press_uni: {
     name: "Leg press 90° unilateral (pé alto)",
+    focal: "Glúteo máximo",
     short: "Leg press unilateral",
     equip: "Leg press 90° ou 45°",
     primary: ["glutes"], secondary: ["quads", "hams"],
@@ -1238,6 +1309,7 @@ const EX = {
   },
   abdutora: {
     name: "Cadeira abdutora (tronco à frente)",
+    focal: "Glúteo médio e superior",
     equip: "Abdutora",
     primary: ["glutes"], secondary: [],
     target: "Glúteo médio e parte de cima do glúteo máximo", sec: "Tensor da fáscia lata",
@@ -1251,12 +1323,45 @@ const EX = {
     cue: "Tronco à frente, abre e segura.",
     progress: "Faixa 12–20. Topo da faixa em todas as séries com RIR 0–1 → próxima placa.",
   },
+  puxada_uni_cabo: {
+    name: "Puxada unilateral no cabo (ajoelhado)",
+    focal: "Dorsal · porção inferior",
+    equip: "Polia alta + pegada simples",
+    primary: ["lats"], secondary: ["upBack", "biceps"],
+    target: "Grande dorsal (porção inferior)", sec: "Redondo maior, bíceps",
+    goal: "Entrou no lugar da remada baixa, que repetia a remada apoiada. Com o braço subindo até o ombro elevar e o cotovelo descendo em direção ao quadril, é a maior amplitude da semana para a parte de baixo do dorsal, onde o seu V fecha cedo.",
+    setup: ["Polia alta, pegada simples.", "Ajoelhado de frente ou de lado para a polia, joelho do lado que trabalha no chão.", "Tronco levemente inclinado para o lado oposto, braço todo esticado acima da cabeça."],
+    exec: ["Deixe o ombro subir no topo, alongando o dorsal.", "Puxe o cotovelo em arco até a lateral do quadril.", "Volte devagar até o alongamento completo."],
+    breath: "Expira puxando.",
+    rom: "Do ombro elevado, braço todo esticado, até o cotovelo ao lado do quadril.",
+    tempo: "1s puxa · 1s aperta · 2–3s volta",
+    errors: ["Girar o tronco para ajudar a puxar.", "Dobrar o cotovelo cedo e puxar com o bíceps.", "Amplitude curta em cima.", "Encolher o ombro na puxada."],
+    cue: "Estica até o ombro subir, cotovelo pro quadril.",
+    progress: "Faixa 10–12 por lado. 12/12/12 dos dois lados com RIR 1 → próxima placa.",
+  },
+  elev_frontal_cabo: {
+    name: "Elevação frontal na polia (corda)",
+    focal: "Deltoide anterior",
+    equip: "Polia baixa + corda",
+    primary: ["deltFront"], secondary: ["chestUp"],
+    target: "Deltoide anterior", sec: "Peitoral superior",
+    goal: "Opcional, no fim do A1, quando sobrar tempo. Acrescenta pouco, porque o deltoide anterior já trabalha nos dois supinos inclinados e no crucifixo de baixo pra cima. Se o tempo estiver curto, o cardio leve rende mais no cutting.",
+    setup: ["De costas para a polia baixa, cabo passando entre as pernas.", "Corda com pegada neutra, braços esticados à frente das coxas.", "Core firme, joelhos destravados."],
+    exec: ["Suba os braços esticados até a linha dos olhos.", "Desça em 2–3s sem deixar a placa bater."],
+    breath: "Expira subindo.",
+    rom: "Das coxas até a linha dos olhos.",
+    tempo: "1s sobe · 2–3s desce",
+    errors: ["Balançar o tronco.", "Subir acima da cabeça.", "Encolher o ombro."],
+    cue: "Braço longo, sobe até os olhos.",
+    progress: "Faixa 12–15. 15/15 com RIR 2 → próxima placa.",
+  },
   cardio: {
     name: "Cardio leve (esteira inclinada ou bike)",
+    focal: "Aeróbico leve",
     equip: "Esteira, bike ou escada",
     primary: [], secondary: ["quads", "calves"],
     target: "Gasto calórico do cutting", sec: "Condicionamento",
-    goal: "Fixo no fim do D porque sábado é o dia com mais tempo, o que diminui a chance de pular. Ritmo leve não atrapalha a recuperação das pernas e ajuda o déficit do cutting. Duração e frequência alinhadas com o nutricionista.",
+    goal: "Fixo no fim do D, porque sábado é o dia com mais tempo e fica mais difícil pular. Na sexta, depois do A1, é opcional e bem leve. Ritmo leve não atrapalha a recuperação das pernas e ajuda o déficit do cutting. Avise o nutricionista sobre os dois cardios da semana.",
     setup: ["Esteira com inclinação de 8–12%, ou bike com carga leve.", "Velocidade em que você consegue conversar em frases completas."],
     exec: ["Mantenha o ritmo constante do início ao fim.", "Na esteira, não segure no apoio: isso tira o gasto do exercício."],
     breath: "Se dá para conversar, a intensidade está certa.",
@@ -1271,67 +1376,67 @@ const EX = {
 /* -------------------------------- PROGRAMA ------------------------------- */
 const e = (id, sets, reps, rir, rest, restSec, prio, note, x = {}) => ({ id, sets, reps, rir, rest, restSec, prio, note, ...x });
 
-/* Bloco 2 (nov/2026, dieta em cutting). Ordem: A · B · C · B2 · A1 · D.
-   As keys antigas foram mantidas para não perder o histórico salvo no aparelho. */
+/* Bloco 2 (nov/2026, dieta em cutting). Ordem: B · A · C · B2 · A1 · D.
+   As keys antigas foram mantidas para não perder o histórico salvo no aparelho.
+   anchor = exercício de referência: 1 série pesada + séries leves (reps "pesada / leves"). */
 const PROGRAM = [
   {
-    key: "pushA", day: "SEG", name: "A · Push", app: "hevy",
-    focus: "Peitoral superior + deltoide lateral",
-    goal: "Abrir a semana com o deltoide lateral descansado. Continua igual ao bloco anterior: o lateral entra antes de qualquer press.",
-    dur: "70–80 min", sets: 18,
-    prios: ["Deltoide lateral", "Peitoral superior"],
-    ex: [
-      e("elev_cabo_uni", 4, "10–15", "1", "90s", 90, "A", "Primeiro exercício da semana, de propósito."),
-      e("supino_incl_halt", 3, "6–10", "1–2", "2–3 min", 150, "B"),
-      e("chest_press", 3, "8–12", "1–2", "2 min", 120, "B"),
-      e("elev_halt", 3, "12–20", "0–2", "60–90s", 75, "A", "Faixa alta. Carga leve, execução limpa."),
-      e("crucifixo_maq", 2, "10–15", "1", "90s", 90, "C"),
-      e("tri_overhead", 3, "8–12", "1", "90–120s", 105, "C"),
-    ],
-  },
-  {
-    key: "pullA", day: "TER", name: "B · Pull", app: "hevy",
+    key: "pullA", day: "SEG", name: "B · Pull", app: "hevy",
     focus: "Costas com prioridade em largura",
-    goal: "Atacar a porção inferior do dorsal, onde seu V-taper fecha cedo demais. Vetores verticais e extensão de ombro, não retração escapular. Se sobrar tempo, abdômen opcional no fim.",
+    goal: "Abre a semana logo depois do descanso, com o treino de costas mais pesado. Foco na parte de baixo do dorsal, onde o seu V fecha cedo: puxadas verticais e cotovelo descendo para o quadril.",
     dur: "75–85 min", sets: 19,
     prios: ["Dorsais / largura", "Deltoide posterior"],
     ex: [
-      e("pullup", 3, "6–10", "1–2", "2–3 min", 165, "A", "Use assistência se precisar. Não faça kipping."),
-      e("pulldown_neutro", 3, "8–12", "1", "2 min", 120, "A"),
+      e("pullup", 3, "6–10", "1–2", "2–3 min", 165, "A", "Abaixo de 6 reps, use assistência. Sem kipping."),
+      e("pulldown_neutro", 3, "6–8 / 8–10", "1 / 2", "2 min", 120, "A", null, { anchor: true }),
       e("remada_uni_cabo", 3, "8–12", "1", "90–120s", 105, "A", "Cotovelo para o quadril, não para fora."),
       e("pulldown_reto", 2, "12–15", "0–1", "60–90s", 75, "B"),
       e("reverse_pec", 3, "12–20", "0–1", "60–90s", 75, "B"),
       e("rosca_inclinada", 3, "8–12", "1", "90s", 90, "C"),
       e("hammer", 2, "10–15", "0–1", "60–90s", 75, "C"),
-      e("hanging_leg", 3, "10–15", "1", "60–90s", 75, "C", "Opcional: só se sobrar tempo. O abdominal fixo da semana é no D.", { opt: true }),
+    ],
+  },
+  {
+    key: "pushA", day: "TER", name: "A · Push", app: "hevy",
+    focus: "Deltoide lateral + peitoral superior",
+    goal: "O lateral entra antes de qualquer supino, com você descansado. O peito médio, que já é ponto forte, fica em manutenção só com o chest press. Se sobrar tempo, abdômen opcional no fim.",
+    dur: "60–70 min", sets: 16,
+    prios: ["Deltoide lateral", "Peitoral superior"],
+    ex: [
+      e("elev_cabo_uni", 4, "10–15", "1", "90s", 90, "A", "Primeiro exercício do dia, de propósito."),
+      e("supino_incl_halt", 3, "6–8 / 8–10", "1 / 2", "2–3 min", 150, "B", "Banco a 30°.", { anchor: true }),
+      e("chest_press", 3, "8–12", "1–2", "2 min", 120, "C", "Manutenção do peito médio."),
+      e("elev_halt", 3, "12–20", "0–2", "60–90s", 75, "A", "Faixa alta. Carga leve, execução limpa."),
+      e("tri_overhead", 3, "8–12", "1", "90–120s", 105, "C"),
+      e("hanging_leg", 3, "10–15", "1", "60–90s", 75, "C", "Só se sobrar tempo. O abdominal fixo é no D.", { opt: true }),
     ],
   },
   {
     key: "legsA", day: "QUA", name: "C · Pernas", app: "stronger",
     focus: "Glúteo + manutenção de coxa + panturrilha",
-    goal: "Único dia de perna da semana. O foco é deixar o glúteo mais projetado; quadríceps e posterior ficam em manutenção porque já são pontos fortes. Hack e agachamento saíram: davam pouco estímulo pra você. Aquecimento: 5 min de bike + 2 séries leves de hip thrust.",
+    goal: "Único dia de perna da semana. O foco é deixar o glúteo mais projetado; quadríceps e posterior ficam em manutenção porque já são pontos fortes. Aquecimento: 5 min de bike + 2 séries leves de hip thrust.",
     dur: "80–90 min", sets: 23,
     prios: ["Glúteo", "Panturrilha"],
     ex: [
-      e("hip_thrust", 4, "6–10", "1–2", "2–3 min", 150, "B", "Segura 1s no topo."),
+      e("hip_thrust", 4, "6–8 / 8–10", "1 / 2", "2–3 min", 150, "B", "Segura 1s no topo.", { anchor: true }),
       e("bulgaro", 3, "8–12", "1–2", "2 min", 120, "B", "Por perna. Toque no exercício para trocar pelo substituto.", { alt: "leg_press_uni" }),
       e("rdl", 3, "8–10", "2", "2–3 min", 150, "B", "A lombar arredondar define o fim da amplitude."),
       e("abdutora", 3, "12–20", "0–1", "60–90s", 75, "B", "Tronco inclinado à frente."),
-      e("flexora_sentada", 3, "8–12", "1", "90–120s", 105, "C", "Manutenção."),
+      e("flexora_sentada", 3, "8–12", "1", "90–120s", 105, "C", "Manutenção. Tronco levemente à frente alonga mais."),
       e("extensora", 3, "10–15", "0–1", "90s", 90, "C", "Manutenção. Pega o reto femoral, que o agachamento quase não trabalha."),
       e("pant_pe", 4, "8–12", "0–1", "90s", 90, "A", "BLOCO OBRIGATÓRIO. Pausa embaixo, sem quique."),
     ],
   },
   {
     key: "pullB", day: "QUI", name: "B2 · Pull", app: "hevy",
-    focus: "Largura + espessura",
-    goal: "Segundo dia de costas, com viés mais horizontal. Fecha 22 séries semanais de costas. Sem rosca aqui: o bíceps tem dia próprio no sábado e precisa chegar descansado.",
+    focus: "Dorsal inferior + espessura",
+    goal: "Segundo dia de costas, 72h depois do B. A remada baixa saiu porque repetia a remada apoiada; no lugar entrou a puxada unilateral, com a maior amplitude da semana para a parte de baixo do dorsal. Sem rosca aqui: o bíceps chega descansado no sábado.",
     dur: "55–65 min", sets: 13,
-    prios: ["Dorsais", "Upper back"],
+    prios: ["Dorsal inferior", "Upper back"],
     ex: [
-      e("pulldown_aberto", 3, "8–12", "1", "2 min", 120, "A"),
-      e("chest_supported_row", 3, "6–10", "1–2", "2–3 min", 150, "A", "Lombar fora da equação. Puxe pesado com segurança."),
-      e("seated_row", 3, "10–15", "1", "2 min", 120, "A"),
+      e("pulldown_aberto", 3, "8–12", "1", "2 min", 120, "A", "Pegada em torno de 1,5x os ombros, não mais."),
+      e("chest_supported_row", 3, "6–8 / 8–10", "1 / 2", "2–3 min", 150, "A", null, { anchor: true }),
+      e("puxada_uni_cabo", 3, "10–12", "1", "90s", 90, "A", "Por lado."),
       e("pullover", 2, "10–15", "0–1", "90s", 90, "B"),
       e("reverse_pec", 2, "12–20", "0–1", "60–90s", 75, "B"),
     ],
@@ -1339,51 +1444,53 @@ const PROGRAM = [
   {
     key: "pushB", day: "SEX", name: "A1 · Ombros", app: "hevy",
     focus: "Deltoide lateral em 3 ângulos + peitoral superior",
-    goal: "Dia de ombro. Três elevações laterais com curvas de resistência diferentes: o halter carrega o topo, o cabo baixo carrega a parte de baixo e a máquina mantém a carga constante. Lateral sobe para 16 séries na semana. A elevação frontal ficou de fora: o supino inclinado já cobre o deltoide anterior.",
+    goal: "Dia de ombro. Três elevações laterais com curvas de resistência diferentes: o halter carrega o topo, o cabo baixo carrega a parte de baixo e a máquina mantém a carga constante. Elevação frontal e cardio leve ficam no fim, só se sobrar tempo.",
     dur: "70–80 min", sets: 18,
     prios: ["Deltoide lateral", "Peitoral superior", "Deltoide posterior"],
     ex: [
       e("elev_halt", 3, "10–15", "0–1", "60–90s", 75, "A", "Abre o dia. Pare antes de encostar na coxa para manter a tensão."),
       e("elev_cabo_uni", 3, "12–15", "0–1", "60–90s", 75, "A"),
-      e("elev_maq", 3, "12–20", "0", "60–90s", 75, "A", "Sem máquina livre: cabo na altura da cintura."),
-      e("supino_incl_smith", 3, "6–10", "1–2", "2–3 min", 150, "B"),
-      e("crossover_baixo", 3, "10–15", "1", "90s", 90, "B", "Entrou no lugar da elevação frontal."),
+      e("elev_maq", 3, "12–20", "0", "60–90s", 75, "A", "Máquina ocupada? Cabo na altura da cintura."),
+      e("supino_incl_smith", 3, "6–10", "1–2", "2–3 min", 150, "B", "Banco a 30°."),
+      e("crossover_baixo", 3, "10–15", "1", "90s", 90, "B"),
       e("reverse_pec", 3, "12–20", "0–1", "60–90s", 75, "B"),
+      e("elev_frontal_cabo", 2, "12–15", "2", "60–90s", 75, "C", "Se o tempo estiver curto, priorize o cardio.", { opt: true }),
+      e("cardio", 1, "10–20", "—", "—", 0, "C", "Bem leve. Avise o nutricionista sobre os dois cardios da semana.", { unit: "min", opt: true }),
     ],
   },
   {
     key: "armsD", day: "SÁB", name: "D · Braços", app: "hevy",
     focus: "Tríceps + bíceps + glúteo + panturrilha + abdômen + cardio",
-    goal: "Sábado tem mais tempo, então é aqui que o cardio não pode ser pulado. Braço acompanha o ombro que está crescendo. Tríceps sobe de 6 para 11 séries na semana: nas 2 primeiras semanas, faça só 2 séries por exercício de tríceps.",
-    dur: "85–100 min", sets: 26,
+    goal: "Sábado tem mais tempo, então aqui vão séries normais com descanso completo, sem conjugado, e o cardio não é pulado. Os exercícios estão em blocos: dentro de cada bloco a ordem pode mudar se a máquina estiver ocupada.",
+    dur: "95–110 min", sets: 26,
     prios: ["Tríceps", "Bíceps", "Cardio"],
     ex: [
-      e("tri_pushdown", 3, "6–10", "1–2", "90–120s", 105, "B", "Carga pesada. Primeiras 2 semanas: 2 séries."),
-      e("tri_overhead", 3, "10–15", "0–1", "90s", 90, "B"),
-      e("supino_fechado", 2, "8–12", "2", "2 min", 120, "C", "Ou paralelas, se preferir."),
-      e("rosca_direta", 3, "6–10", "1–2", "90–120s", 105, "B"),
-      e("rosca_scott", 3, "10–15", "0–1", "60–90s", 75, "B"),
-      e("rosca_inclinada", 2, "10–12", "1", "60–90s", 75, "C"),
-      e("abdutora", 3, "12–20", "0–1", "60s", 60, "C", "Segundo estímulo de glúteo na semana."),
-      e("pant_sentada", 4, "10–15", "0–1", "90s", 90, "A", "BLOCO OBRIGATÓRIO. Foco no sóleo."),
-      e("cable_crunch", 3, "8–15", "1", "60–90s", 75, "A", "BLOCO OBRIGATÓRIO."),
-      e("cardio", 1, "20–30", "—", "—", 0, "A", "Fecha o treino. Ritmo de conversa.", { unit: "min" }),
+      e("tri_pushdown", 3, "6–10", "1–2", "90–120s", 105, "B", "Carga pesada.", { block: "Bloco 1 · Tríceps" }),
+      e("tri_overhead", 3, "10–15", "0–1", "90s", 90, "B", null, { block: "Bloco 1 · Tríceps" }),
+      e("supino_fechado", 2, "8–12", "2", "2 min", 120, "C", "Ou paralelas, se preferir.", { block: "Bloco 1 · Tríceps" }),
+      e("rosca_direta", 3, "6–10", "1–2", "90–120s", 105, "B", null, { block: "Bloco 2 · Bíceps" }),
+      e("rosca_inclinada", 2, "10–12", "1", "60–90s", 75, "C", null, { block: "Bloco 2 · Bíceps" }),
+      e("rosca_scott", 3, "10–15", "0–1", "60–90s", 75, "B", "Máquina ocupada? Barra W no banco Scott.", { block: "Bloco 2 · Bíceps" }),
+      e("abdutora", 3, "12–20", "0–1", "60s", 60, "C", "Segundo estímulo de glúteo da semana. Ocupada? Abdução no cabo com caneleira, em pé.", { block: "Bloco 3 · Glúteo, panturrilha e abdômen" }),
+      e("pant_sentada", 4, "10–15", "0–1", "90s", 90, "A", "BLOCO OBRIGATÓRIO. Ocupada? Sentado no banco com halter sobre as coxas.", { block: "Bloco 3 · Glúteo, panturrilha e abdômen" }),
+      e("cable_crunch", 3, "8–15", "1", "60–90s", 75, "A", "BLOCO OBRIGATÓRIO.", { block: "Bloco 3 · Glúteo, panturrilha e abdômen" }),
+      e("cardio", 1, "20–30", "—", "—", 0, "A", "Fecha o treino. Ritmo de conversa.", { unit: "min", block: "Bloco 4 · Cardio" }),
     ],
   },
 ];
 
 const VOLUME = [
   { m: "Deltoide lateral", s: 16, tag: "A", note: "7 no A + 9 no A1, em três ângulos diferentes" },
-  { m: "Dorsais / costas", s: 22, tag: "A", note: "Especialização distribuída em B e B2" },
-  { m: "Peitoral", s: 14, tag: "B", note: "Subiu pelo peitoral superior: crucifixo de baixo pra cima no A1" },
+  { m: "Dorsais / costas", s: 22, tag: "A", note: "B e B2 com 72h entre eles; mais foco no dorsal inferior" },
   { m: "Bíceps", s: 13, tag: "B", note: "5 no B + 8 no D. Sem rosca no B2" },
   { m: "Glúteo", s: 13, tag: "B", note: "Foco do C + abdutora no D. Sem pressa" },
-  { m: "Tríceps", s: 11, tag: "B", note: "Subiu de 6 com o dia D. Começa com 2 séries por exercício" },
+  { m: "Peitoral", s: 12, tag: "B", note: "9 no peito alto. Peito médio só em manutenção" },
+  { m: "Tríceps", s: 11, tag: "B", note: "3 no A + 8 no D, além dos supinos" },
   { m: "Deltoide posterior", s: 8, tag: "B", note: "3× por semana, recuperação rápida" },
   { m: "Panturrilha", s: 8, tag: "A", note: "C + D, quarta e sábado" },
   { m: "Quadríceps", s: 6, tag: "C", note: "Manutenção: búlgaro + extensora" },
   { m: "Posteriores", s: 6, tag: "C", note: "Manutenção: RDL + flexora sentada" },
-  { m: "Abdômen", s: 3, tag: "B", note: "Fixo no D. Mais 3 opcionais no fim do B" },
+  { m: "Abdômen", s: 3, tag: "B", note: "Fixo no D. Mais 3 opcionais no fim do A" },
 ];
 
 const WEDGE = [
@@ -1408,7 +1515,7 @@ const PRE_CHECK = [
 const EX_CHECK = ["Setup correto", "Amplitude completa", "Execução controlada", "RIR planejado", "Carga registrada", "Reps registradas"];
 
 /* ------------------------------- UTILITÁRIOS ------------------------------ */
-const DAYKEY = ["dom", "pushA", "pullA", "legsA", "pullB", "pushB", "armsD"];
+const DAYKEY = ["dom", "pullA", "pushA", "legsA", "pullB", "pushB", "armsD"];
 const todayKey = () => DAYKEY[new Date().getDay()];
 const isoDay = () => new Date().toISOString().slice(0, 10);
 const weekId = () => { const d = new Date(); const t = new Date(d.getFullYear(), 0, 1); return `${d.getFullYear()}-W${Math.ceil(((d - t) / 86400000 + t.getDay() + 1) / 7)}`; };
@@ -1423,9 +1530,14 @@ function copyText(t) {
     return Promise.resolve();
   } catch (err) { return Promise.reject(err); }
 }
-const exLine = (it) => it.unit
-  ? `${EX[it.id].name}: ${it.reps} ${it.unit}`
-  : `${EX[it.id].name}: ${it.sets} séries × ${it.reps} reps · RIR ${it.rir} · descanso ${it.rest}${it.opt ? " (opcional)" : ""}${it.alt ? ` · substituto: ${EX[it.alt].name}` : ""}`;
+const exLine = (it) => {
+  const x = EX[it.id], head = `${x.name} [${x.focal}]`;
+  if (it.unit) return `${head}: ${it.reps} ${it.unit}${it.opt ? " (opcional)" : ""}`;
+  const sets = it.anchor
+    ? `1 série pesada ${it.reps.split(" / ")[0]} RIR 1 + ${it.sets - 1} leves ${it.reps.split(" / ")[1]} RIR 2`
+    : `${it.sets} séries × ${it.reps} reps · RIR ${it.rir}`;
+  return `${head}: ${sets} · descanso ${it.rest}${it.opt ? " (opcional)" : ""}${it.alt ? ` · substituto: ${EX[it.alt].name}` : ""}`;
+};
 const workoutText = (w) =>
   `${w.name.toUpperCase()} — ${w.focus}\n${w.ex.map((it, i) => `${i + 1}. ${exLine(it)}`).join("\n")}\n\nRegistro oficial: ${w.app === "hevy" ? "Hevy" : "Stronger"}`;
 
@@ -1433,6 +1545,33 @@ const workoutText = (w) =>
 const Pill = ({ children, k = "" }) => <span className={`pill ${k}`}>{children}</span>;
 const PrioPill = ({ p }) => <span className={`pill ${p === "A" ? "a" : p === "B" ? "b" : "c"}`}><i className="dot" />{p === "A" ? "Prioridade A" : p === "B" ? "Prioridade B" : "Suporte"}</span>;
 const Metric = ({ v, l }) => <div className="mtr"><b className="num">{v}</b><span>{l}</span></div>;
+
+/* Área focal: o "onde" do exercício. sm = listas, lg = cabeçalho do guia, txt = linhas densas. */
+const TargetIcon = ({ s = 12 }) => (
+  <svg viewBox="0 0 16 16" width={s} height={s} fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+    <circle cx="8" cy="8" r="6.2" /><circle cx="8" cy="8" r="2.4" fill="currentColor" stroke="none" />
+  </svg>
+);
+function FocalTag({ id, size = "sm" }) {
+  const f = EX[id]?.focal;
+  if (!f) return null;
+  return (
+    <span className={`focal ${size}`}>
+      <TargetIcon s={size === "lg" ? 14 : 12} />
+      <span><span className="sr">Área focal: </span>{f}</span>
+    </span>
+  );
+}
+/* Cadeia nome → onde → como, fixa no topo do guia do exercício */
+function FocusChain({ id }) {
+  const x = EX[id];
+  return (
+    <div className="focus">
+      <FocalTag id={id} size="lg" />
+      <p className="focus-cue"><b>Cue</b>“{x.cue}”</p>
+    </div>
+  );
+}
 const SecHd = ({ eyebrow, title, right }) => (
   <div className="sec-hd"><div><div className="eyebrow">{eyebrow}</div><h2 className="disp d-m" style={{ marginTop: 5 }}>{title}</h2></div>{right}</div>
 );
@@ -1533,14 +1672,15 @@ function ExerciseSheet({ item, workout, onClose, toast, log, addLog, checks, tog
             </div>
             <button ref={ref} className="btn sm ghost" onClick={onClose} aria-label="Fechar">{I.x()}</button>
           </div>
-          <div className="row" style={{ marginTop: 12, overflowX: "auto", paddingBottom: 2 }}>
+          <FocusChain id={cur} />
+          <div className="row" style={{ marginTop: 16, overflowX: "auto", paddingBottom: 2 }}>
             <Tab id="guia" label="Execução" /><Tab id="mapa" label="Músculos" /><Tab id="reg" label="Registro" />
           </div>
         </div>
 
         <div className="wrap" style={{ paddingTop: 18, paddingBottom: 44 }}>
           <div className="card">
-            <div className="row" style={{ flexWrap: "wrap", gap: 7 }}><PrioPill p={item.prio} />{item.opt && <Pill>Opcional</Pill>}<Pill>{x.equip}</Pill></div>
+            <div className="row" style={{ flexWrap: "wrap", gap: 7 }}><PrioPill p={item.prio} />{item.anchor && <Pill k="info">Referência</Pill>}{item.opt && <Pill>Opcional</Pill>}<Pill>{x.equip}</Pill></div>
             {item.alt && (
               <div style={{ marginTop: 14 }}>
                 <div className="eyebrow" style={{ marginBottom: 7 }}>Variação de hoje</div>
@@ -1558,6 +1698,11 @@ function ExerciseSheet({ item, workout, onClose, toast, log, addLog, checks, tog
             <div className="exr-metrics" style={{ marginTop: 14 }}>
               <Metric v={item.sets} l="séries" /><Metric v={item.reps} l={item.unit || "reps"} /><Metric v={item.rir} l="RIR" /><Metric v={item.rest} l="descanso" />
             </div>
+            {item.anchor && (
+              <p className="small mut" style={{ margin: "16px 0 0" }}>
+                <b style={{ color: "var(--info)" }}>Série pesada + leves.</b> A 1ª série é pesada ({item.reps.split(" / ")[0]} reps, RIR 1) e é a que você registra. Depois, {item.sets - 1} séries com ~10% menos carga ({item.reps.split(" / ")[1]} reps, RIR 2). No cutting, manter a carga da pesada já é sucesso.
+              </p>
+            )}
             {item.restSec > 0 && <button className="btn primary" style={{ marginTop: 15 }} onClick={() => setTimer((t) => !t)}>{I.timer()} {timer ? "Fechar timer" : "Iniciar descanso"}</button>}
             {timer && <RestTimer seconds={item.restSec} onClose={() => setTimer(false)} />}
           </div>
@@ -1573,10 +1718,6 @@ function ExerciseSheet({ item, workout, onClose, toast, log, addLog, checks, tog
                   <ExFigure key={cur} exId={cur} height={186} />
                 </div>
               )}
-              <div className="card" style={{ marginTop: 12, background: "var(--accent-dim)", borderColor: "var(--accent-line)" }}>
-                <div className="eyebrow" style={{ color: "var(--accent)" }}>Cue principal</div>
-                <div className="disp d-s" style={{ marginTop: 7, textTransform: "none", fontSize: 17, lineHeight: 1.25 }}>“{x.cue}”</div>
-              </div>
               <Block t="Por que está no programa"><p className="small mut" style={{ margin: 0 }}>{x.goal}</p></Block>
               {item.note && <Block t="Observação desta sessão"><p className="small" style={{ margin: 0, color: "var(--warn)" }}>{item.note}</p></Block>}
               <Block t="Setup"><Steps items={x.setup} /></Block>
@@ -1742,12 +1883,17 @@ function WorkoutView({ w, onBack, onOpen, toast, checks, toggleCheck, sessionDon
       </div>
 
       <div className="sec">
-        <SecHd eyebrow="Ordem importa" title="Exercícios" right={<span className="tiny mut3">toque para o guia</span>} />
+        <SecHd eyebrow={w.ex.some((it) => it.block) ? "Ordem por bloco" : "Ordem importa"} title="Exercícios" right={<span className="tiny mut3">toque para o guia</span>} />
+        {w.ex.some((it) => it.block) && (
+          <p className="tiny mut3" style={{ margin: "0 0 12px" }}>Academia cheia? Dentro de cada bloco a ordem pode mudar. Entre os blocos, mantenha a sequência.</p>
+        )}
         <div className="card" style={{ paddingTop: 4, paddingBottom: 4 }}>
           {w.ex.map((it, i) => {
             const x = EX[it.id];
+            const newBlock = it.block && (i === 0 || w.ex[i - 1].block !== it.block);
             return (
               <div key={it.id + i}>
+                {newBlock && <div className="blk eyebrow" style={{ color: "var(--ink-2)" }}>{it.block}</div>}
                 <button className="tap exr" onClick={() => onOpen(it)}>
                   <div className="thumb"><ExFigure exId={it.id} height={62} compact /></div>
                   <div className="exr-body">
@@ -1756,10 +1902,11 @@ function WorkoutView({ w, onBack, onOpen, toast, checks, toggleCheck, sessionDon
                         <div className="row" style={{ gap: 7, marginBottom: 4 }}>
                           <span className="num" style={{ fontSize: 11, color: it.prio === "A" ? "var(--accent)" : "var(--ink-3)", letterSpacing: ".1em" }}>{String(i + 1).padStart(2, "0")}</span>
                           {it.prio === "A" && <span className="pill ok" style={{ padding: "2px 7px", fontSize: 9.5 }}>PRIORIDADE</span>}
+                          {it.anchor && <span className="pill info" style={{ padding: "2px 7px", fontSize: 9.5 }}>REFERÊNCIA</span>}
                           {it.opt && <span className="pill" style={{ padding: "2px 7px", fontSize: 9.5 }}>OPCIONAL</span>}
                         </div>
                         <div className="disp d-s" style={{ textTransform: "none", fontSize: 16.5, lineHeight: 1.2 }}>{x.name}</div>
-                        <div className="tiny mut3" style={{ marginTop: 3 }}>{x.target}</div>
+                        <div style={{ marginTop: 8 }}><FocalTag id={it.id} /></div>
                       </div>
                       <span style={{ color: "var(--ink-3)", flex: "none", paddingTop: 3 }}>{I.chev()}</span>
                     </div>
@@ -1770,7 +1917,7 @@ function WorkoutView({ w, onBack, onOpen, toast, checks, toggleCheck, sessionDon
                     {it.alt && <div className="tiny" style={{ marginTop: 6, color: "var(--info)" }}>Substituto disponível: {EX[it.alt].name}</div>}
                   </div>
                 </button>
-                {i < w.ex.length - 1 && <hr className="hair" />}
+                {i < w.ex.length - 1 && w.ex[i + 1].block === it.block && <hr className="hair" />}
               </div>
             );
           })}
@@ -1805,7 +1952,7 @@ function Today({ go, openWorkout, checks, counters }) {
           <div className="mut" style={{ marginTop: 7, fontSize: 14.5, maxWidth: 260 }}>{w.focus}</div>
 
           <div className="row" style={{ marginTop: 20, gap: 22 }}>
-            <Metric v={w.ex.length} l="exercícios" />
+            <Metric v={w.ex.filter((it) => !it.opt).length} l="exercícios" />
             <Metric v={w.sets} l="séries" />
             <Metric v={w.dur.split("–")[0]} l="min" />
           </div>
@@ -1816,7 +1963,8 @@ function Today({ go, openWorkout, checks, counters }) {
               <div className="thumb" style={{ width: 54, height: 54 }}><ExFigure exId={w.ex[0].id} height={50} compact /></div>
               <div style={{ minWidth: 0, flex: 1 }}>
                 <div className="disp d-s" style={{ textTransform: "none", fontSize: 15.5, lineHeight: 1.2 }}>{first.name}</div>
-                <div className="tiny mut3" style={{ marginTop: 4 }}>{w.ex[0].sets} × {w.ex[0].reps} · RIR {w.ex[0].rir} · {w.ex[0].rest}</div>
+                <div style={{ marginTop: 8 }}><FocalTag id={w.ex[0].id} /></div>
+                <div className="tiny mut3" style={{ marginTop: 8 }}>{w.ex[0].sets} × {w.ex[0].reps} · RIR {w.ex[0].rir} · {w.ex[0].rest}</div>
               </div>
               <span style={{ color: "var(--accent)", flex: "none" }}>{I.chev()}</span>
             </div>
@@ -1878,7 +2026,7 @@ function Today({ go, openWorkout, checks, counters }) {
           </div>
           <div className="card-flat" style={{ borderColor: "rgba(255,184,77,.25)" }}>
             <div className="row"><span className="pill b"><i className="dot" />Registro de carga</span></div>
-            <p className="small mut" style={{ margin: "10px 0 0" }}>Sem carga anotada, a double progression não funciona — você não sabe se bateu o topo da faixa. Comece por três: elevação lateral, puxada alta e supino inclinado.</p>
+            <p className="small mut" style={{ margin: "10px 0 0" }}>No cutting, a força nos 4 exercícios de referência é o termômetro de massa magra. Registre sempre a série pesada deles: supino inclinado, puxada neutra, remada apoiada e hip thrust.</p>
           </div>
           <div className="card-flat" style={{ borderColor: "rgba(106,168,255,.25)" }}>
             <div className="row"><span className="pill info"><i className="dot" />Passos</span><span className="num mut" style={{ fontSize: 13 }}>meta 8.000/dia</span></div>
@@ -1939,7 +2087,7 @@ function Week({ openWorkout, sessionDone }) {
         <div className="grid2">
           <div className="card-flat" style={{ borderColor: "var(--accent-line)" }}>
             <div className="eyebrow" style={{ color: "var(--accent)" }}>Hevy · superiores</div>
-            <p className="small mut" style={{ margin: "9px 0 0" }}>A · B · B2 · A1 · D</p>
+            <p className="small mut" style={{ margin: "9px 0 0" }}>B · A · B2 · A1 · D</p>
           </div>
           <div className="card-flat" style={{ borderColor: "rgba(106,168,255,.3)" }}>
             <div className="eyebrow" style={{ color: "var(--info)" }}>Stronger · inferiores</div>
@@ -2059,6 +2207,28 @@ function Method() {
       </div>
 
       <div className="sec">
+        <SecHd eyebrow="No cutting" title="Exercícios de referência" />
+        <div className="card">
+          <p className="small" style={{ margin: 0 }}>
+            Em déficit, a meta é <b>não perder carga</b>. A força em 4 exercícios é o termômetro de que a massa magra está ficando.
+          </p>
+          <div className="row" style={{ marginTop: 16, flexWrap: "wrap", gap: 8 }}>
+            {["Puxada neutra · B", "Supino inclinado · A", "Hip thrust · C", "Remada apoiada · B2"].map((t) => <Pill key={t} k="info">{t}</Pill>)}
+          </div>
+          <div className="stack" style={{ marginTop: 16 }}>
+            {[
+              ["Série pesada", "6–8 reps, RIR 1. É a que você registra."],
+              ["Séries leves", "~10% menos carga, 8–10 reps, RIR 2."],
+              ["Caiu 2 semanas seguidas?", "Corte 1 série de cada isolador daquele grupo antes de mexer na carga."],
+            ].map(([t, d]) => (
+              <div className="card-flat" key={t}><div className="eyebrow">{t}</div><p className="small mut" style={{ margin: "8px 0 0" }}>{d}</p></div>
+            ))}
+          </div>
+          <p className="tiny mut3" style={{ marginTop: 16 }}>Nos isoladores, a dupla progressão continua igual. Falha só na última série deles; nos compostos, nunca.</p>
+        </div>
+      </div>
+
+      <div className="sec">
         <SecHd eyebrow="Regra de ouro" title="Não mude o programa" />
         <div className="card">
           <div className="stack">
@@ -2115,7 +2285,7 @@ function LogView({ log, openEx }) {
       {total === 0 && (
         <div className="empty" style={{ marginTop: 14 }}>
           <div className="disp d-s" style={{ color: "var(--ink-2)" }}>Nada anotado ainda</div>
-          <p className="small" style={{ marginTop: 8 }}>Comece por três: elevação lateral no cabo, lat pulldown e supino inclinado. Só isso já permite um check-in de verdade no fim do bloco.</p>
+          <p className="small" style={{ marginTop: 8 }}>Comece pela série pesada dos 4 exercícios de referência: supino inclinado, puxada neutra, remada apoiada e hip thrust. Só isso já permite um check-in de verdade.</p>
         </div>
       )}
 
@@ -2132,7 +2302,7 @@ function LogView({ log, openEx }) {
                       <div className="thumb" style={{ width: 46, height: 46, borderRadius: 12 }}><ExFigure exId={it.id} height={42} compact /></div>
                       <div style={{ minWidth: 0 }}>
                         <div style={{ fontSize: 14.5, lineHeight: 1.3 }}>{EX[it.id].name}</div>
-                        <div className="tiny mut3" style={{ marginTop: 3 }}>{w.name} · {it.sets} × {it.reps}</div>
+                        <div className="tiny mut3 row" style={{ marginTop: 4, gap: 8, flexWrap: "wrap" }}><FocalTag id={it.id} size="txt" /><span>{w.name}</span></div>
                       </div>
                     </div>
                     <div className="row" style={{ gap: 9, flex: "none" }}>
@@ -2229,7 +2399,7 @@ function Recovery({ recovery, saveRecovery, toast }) {
               <div key={a}><div className="between"><span style={{ fontSize: 14 }}>{a}</span><span className="num mut" style={{ fontSize: 13 }}>{b}</span></div><div className="tiny mut3" style={{ marginTop: 3 }}>{c}</div><hr className="hair" style={{ marginTop: 11 }} /></div>
             ))}
           </div>
-          <p className="tiny mut3" style={{ marginTop: 12 }}>Deload no fim do bloco: mesmos exercícios, mesma carga, metade das séries, RIR 3–4. Não é opcional.</p>
+          <p className="tiny mut3" style={{ marginTop: 12 }}>Deload na semana 6: mesmos exercícios, mesma carga, metade das séries, RIR 3–4. Se o nutricionista fizer pausa na dieta, junte as duas. Não é opcional.</p>
         </div>
       </div>
     </div>
